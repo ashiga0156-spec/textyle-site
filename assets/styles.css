@@ -289,3 +289,53 @@
 
   .reveal{ opacity:0; transform: translateY(10px); transition: opacity .5s ease, transform .5s ease; }
   .reveal.in{ opacity:1; transform:none; }
+
+  /* ---- works.html: page hero (shorter variant) ---- */
+  .page-hero .hero-grid{ max-width: 720px; padding-bottom: 56px; }
+  .page-hero .lede{ margin-bottom: 0; }
+
+  /* ---- works.html: breadcrumb ---- */
+  .breadcrumb{
+    font-family: var(--latin); font-size: 12px; font-weight:500;
+    color: rgba(255,255,255,0.6); margin-bottom: 18px;
+  }
+  .breadcrumb a{ color: rgba(255,255,255,0.85); text-decoration:none; border-bottom: 1px solid rgba(255,255,255,0.35); }
+  .breadcrumb a:hover{ color: var(--gold); border-color: var(--gold); }
+
+  /* ---- works.html: story-format case cards ---- */
+  .story-list{ display:flex; flex-direction:column; gap: 28px; }
+  .story-case{ padding: 30px 28px 26px; }
+  .story-top{
+    display:flex; justify-content:space-between; align-items:flex-start;
+    gap:16px; margin-bottom: 22px; flex-wrap:wrap;
+  }
+  .story-top h3{ font-family: var(--display); font-weight:700; font-size:18px; margin:0 0 6px; color: var(--ink); }
+  .story-category{
+    display:block;
+    font-family: var(--latin); font-size: 11px; font-weight:600;
+    letter-spacing:.08em; text-transform:uppercase; color: var(--gold-deep);
+  }
+  .story-steps{
+    display:grid; grid-template-columns: repeat(3, 1fr); gap: 24px;
+    border-top: 1px solid var(--line); padding-top: 22px; margin-bottom: 16px;
+  }
+  .story-step .step-label{
+    display:block; font-family: var(--latin); font-weight:600; font-size:11px;
+    letter-spacing:.1em; text-transform:uppercase; color: var(--navy);
+    margin-bottom:8px;
+  }
+  .story-step p{ margin:0; font-size:14px; color: var(--ink-soft); }
+  .story-case .meta{ margin-top:0; }
+
+  @media (max-width: 900px){
+    .story-steps{ grid-template-columns: 1fr; gap: 18px; }
+    .story-step{ padding-bottom: 14px; border-bottom: 1px solid var(--line); }
+    .story-step:last-child{ border-bottom:none; padding-bottom:0; }
+  }
+
+  /* ---- works.html: closing note ---- */
+  .works-note{
+    background:#fff; border: 1px solid var(--line); border-left: 4px solid var(--gold);
+    border-radius:4px; padding: 24px 26px; margin-top: 6px;
+  }
+  .works-note p{ margin:0; font-size:14px; color: var(--ink-soft); max-width: 62ch; }
