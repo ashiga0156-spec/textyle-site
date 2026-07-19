@@ -136,16 +136,7 @@
   }
   .hero-inner{ position:relative; z-index:2; }
   .hero-grid{
-    display:grid;
-    grid-template-columns: 1fr;
-    gap: 40px;
-    align-items:center;
-  }
-  .hero-visual{ display:flex; justify-content:center; align-items:center; padding: 10px 0; }
-  .hero-visual img{ width:100%; max-width: 220px; opacity:0.95; }
-  @media (min-width: 900px){
-    .hero-grid{ grid-template-columns: 1.25fr 1fr; gap: 56px; }
-    .hero-visual img{ max-width: 320px; }
+    max-width: 640px;
   }
   .eyebrow{
     font-family: var(--latin);
@@ -346,12 +337,6 @@
 
   /* ---- footer ---- */
   footer{ background: var(--navy-deep); color: rgba(255,255,255,0.7); padding: 34px 0; }
-  footer .specnote{
-    font-family: var(--body); font-size:12px; line-height:1.9;
-    border-top: 1px solid rgba(255,255,255,0.14);
-    padding-top: 18px; margin-top: 18px;
-    color: rgba(255,255,255,0.55);
-  }
   footer .foot-row{
     display:flex; justify-content:space-between; align-items:center;
     font-size:12px; flex-wrap:wrap; gap:8px;
@@ -408,9 +393,6 @@
           <a class="btn-primary" href="#contact">お仕事のご相談はこちら</a>
           <a class="btn-secondary" href="#works">まずは実績を見る ↓</a>
         </div>
-      </div>
-      <div class="hero-visual">
-        <img src="assets/logo-icon.png" alt="TEXTYLE ロゴマーク" width="500" height="488" loading="eager">
       </div>
     </div>
     <div class="specs-row">
@@ -570,9 +552,6 @@
     <div class="foot-row">
       <span>© 2026 TEXTYLE / Rei Shiga</span>
       <span>Niigata, Japan</span>
-    </div>
-    <div class="specnote">
-      SEO実装: meta title / description・OGP・構造化データ(Person)/ 見出し階層(h1→h2→h3)を整理 / 軽量な静的HTML・CSSで表示速度を担保 / セクション間の内部リンクを実装
     </div>
   </div>
 </footer>
