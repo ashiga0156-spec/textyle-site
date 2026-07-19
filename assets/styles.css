@@ -232,7 +232,7 @@
   .profile-text strong{ color: var(--ink); }
   .timeline{ position:relative; display:flex; justify-content:space-between; padding-top: 10px; }
   .timeline::before{ content:""; position:absolute; top:5px; left:0; right:0; height:2px; background: var(--line); }
-  .t-stop{ position:relative; max-width:46%; padding-top: 22px; }
+  .t-stop{ position:relative; max-width:30%; padding-top: 22px; }
   .t-stop::before{
     content:""; position:absolute; top:-4px; left:0;
     width:12px; height:12px; border-radius:50%;
