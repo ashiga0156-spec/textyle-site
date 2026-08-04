@@ -247,13 +247,41 @@
   <svg class="wave" viewBox="0 0 1440 80" preserveAspectRatio="none" aria-hidden="true" style="transform:rotate(180deg); margin-bottom:-2px;">
     <path d="M0,30 C240,70 480,0 720,30 C960,60 1200,0 1440,30 L1440,80 L0,80 Z" style="fill:var(--paper)"></path>
   </svg>
-  <div class="wrap" style="padding: 20px 28px 10px;">
-    <div class="eyebrow" style="display:flex;">Contact</div>
+  <div class="wrap" style="padding: 20px 28px 60px;">
+    <div class="eyebrow" style="display:flex; justify-content:center;">Contact</div>
     <h2>お仕事のご相談を承ります</h2>
     <p class="lede">SEOコンテンツ設計、記事執筆・編集、LPライティングなど、お仕事のご相談はこちらから。</p>
-    <div class="cta-buttons">
-      <a class="btn-primary" href="mailto:a.shiga@textyle-ni.net">メールで相談する</a>
-    </div>
+
+    <form class="contact-form" id="contact-form" action="https://formspree.io/f/xaewwnvz" method="POST">
+      <input type="text" name="_gotcha" class="hp-field" tabindex="-1" autocomplete="off">
+      <input type="hidden" name="_subject" value="TEXTYLEサイトからのお問い合わせ">
+
+      <div class="form-row">
+        <label for="cf-name">お名前<span class="req">必須</span></label>
+        <input type="text" id="cf-name" name="name" required autocomplete="name">
+      </div>
+
+      <div class="form-row">
+        <label for="cf-company">会社名・屋号</label>
+        <input type="text" id="cf-company" name="company" autocomplete="organization">
+      </div>
+
+      <div class="form-row">
+        <label for="cf-email">メールアドレス<span class="req">必須</span></label>
+        <input type="email" id="cf-email" name="email" required autocomplete="email">
+      </div>
+
+      <div class="form-row">
+        <label for="cf-message">ご相談内容<span class="req">必須</span></label>
+        <textarea id="cf-message" name="message" required></textarea>
+      </div>
+
+      <button type="submit" class="btn-primary">送信する</button>
+    </form>
+
+    <p id="form-status" class="form-status" role="status" aria-live="polite"></p>
+
+    <p class="form-alt">またはお急ぎの場合は <a href="mailto:a.shiga@textyle-ni.net">メールで直接ご相談</a> ください。</p>
   </div>
 </section>
 
@@ -274,6 +302,40 @@
     document.querySelectorAll('.reveal').forEach(el => io.observe(el));
   } else {
     document.querySelectorAll('.reveal').forEach(el => el.classList.add('in'));
+  }
+
+  const contactForm = document.getElementById('contact-form');
+  if (contactForm) {
+    contactForm.addEventListener('submit', async function (e) {
+      e.preventDefault();
+      const status = document.getElementById('form-status');
+      const btn = contactForm.querySelector('button[type="submit"]');
+      const originalLabel = btn.textContent;
+      btn.disabled = true;
+      btn.textContent = '送信中…';
+      status.textContent = '';
+      status.className = 'form-status';
+
+      try {
+        const res = await fetch(contactForm.action, {
+          method: 'POST',
+          body: new FormData(contactForm),
+          headers: { 'Accept': 'application/json' }
+        });
+        if (res.ok) {
+          contactForm.hidden = true;
+          status.textContent = 'お問い合わせありがとうございます。内容を確認のうえ、折り返しご連絡いたします。';
+          status.className = 'form-status success';
+        } else {
+          throw new Error('send failed');
+        }
+      } catch (err) {
+        status.textContent = '送信に失敗しました。お手数ですが、下記のメールより直接ご連絡ください。';
+        status.className = 'form-status error';
+        btn.disabled = false;
+        btn.textContent = originalLabel;
+      }
+    });
   }
 </script>
 
