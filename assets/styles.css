@@ -400,3 +400,87 @@
   @media (max-width:720px){
     table.compare-table{ min-width: 560px; }
   }
+
+  /* ---- contact form ---- */
+  .contact-form{
+    max-width: 480px;
+    margin: 8px auto 0;
+    text-align: left;
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+  }
+  .contact-form .form-row{
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+  .contact-form label{
+    font-family: var(--body);
+    font-size: 13.5px;
+    font-weight: 500;
+    color: rgba(255,255,255,0.85);
+  }
+  .contact-form label .req{
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--navy-deep);
+    background: var(--gold);
+    border-radius: 100px;
+    padding: 1px 8px;
+    margin-left: 8px;
+    vertical-align: middle;
+  }
+  .contact-form input[type="text"],
+  .contact-form input[type="email"],
+  .contact-form textarea{
+    font-family: var(--body);
+    font-size: 15px;
+    color: var(--ink);
+    background: var(--paper);
+    border: 1px solid rgba(255,255,255,0.18);
+    border-radius: 10px;
+    padding: 12px 14px;
+    width: 100%;
+  }
+  .contact-form textarea{ min-height: 130px; resize: vertical; }
+  .contact-form input:focus,
+  .contact-form textarea:focus{
+    outline: none;
+    border-color: var(--gold);
+    box-shadow: 0 0 0 3px rgba(234,182,19,0.25);
+  }
+  .contact-form button.btn-primary{
+    align-self: center;
+    border: none;
+    cursor: pointer;
+    font-family: var(--body);
+    margin-top: 6px;
+  }
+  .contact-form button.btn-primary:disabled{
+    opacity: 0.6;
+    cursor: default;
+    transform: none;
+    box-shadow: none;
+  }
+  .contact-form .hp-field{
+    position: absolute;
+    left: -9999px;
+    width: 1px; height: 1px;
+    overflow: hidden;
+  }
+  .form-status{
+    max-width: 480px;
+    margin: 18px auto 0;
+    font-size: 14px;
+    font-weight: 600;
+    min-height: 0;
+  }
+  .form-status.success{ color: var(--gold); }
+  .form-status.error{ color: #ff9d9d; }
+  .form-alt{
+    font-size: 13.5px;
+    color: rgba(255,255,255,0.75);
+    margin: 18px 0 0;
+  }
+  .form-alt a{ color: var(--gold); }
