@@ -1,0 +1,36 @@
+name: Update column index & sitemap
+
+# column/ に記事HTMLを追加・変更してpushすると自動実行されます。
+# 実行対象ブランチが「main」以外の場合(masterなど)は下のbranchesを合わせて変更してください。
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'column/*.html'
+
+# リポジトリへの自動コミット・pushに必要な権限
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Generate column index & sitemap
+        run: node .github/scripts/build-column.js
+
+      - name: Commit changes if any
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add column/index.html sitemap.xml
+          git diff --staged --quiet || git commit -m "chore: auto-update column index & sitemap"
+          git push
