@@ -207,6 +207,11 @@
   }
   .case p{ margin:0; color: var(--ink-soft); font-size: 14.5px; max-width: 62ch; }
   .case .meta{ font-family: var(--latin); font-size: 11px; color: var(--navy-soft); margin-top:10px; letter-spacing:.03em; }
+  .case-price{
+    font-family: var(--body); font-weight:700; font-size:15px; color: var(--navy);
+    margin: 14px 0 0; padding-top: 14px; border-top: 1px dashed var(--line);
+  }
+  .case-price .amount{ color: var(--gold-deep); }
 
   @media (min-width: 900px){
     .works-grid{ grid-template-columns: repeat(3, 1fr); gap: 22px; }
@@ -382,7 +387,18 @@
   .source-list{ font-size:12px; color: var(--ink-soft); margin:0; padding-left: 1.2em; }
   .source-list li{ margin-bottom:4px; }
 
+  /* ---- pricing ---- */
+  .pricing-tier{ margin: 36px 0 24px; }
+  .pricing-tier:first-of-type{ margin-top: 4px; }
+  .pricing-tier h3{ font-family: var(--display); font-weight:700; font-size:16px; color: var(--navy); margin:0 0 12px; }
+  table.price-table{ width:100%; border-collapse:collapse; font-size:14px; }
+  table.price-table td{ padding: 11px 16px; border-top:1px solid var(--line); color: var(--ink-soft); }
+  table.price-table tr:first-child td{ border-top:none; }
+  table.price-table tr:nth-child(even) td{ background: var(--paper-tint); }
+  table.price-table td:last-child{ text-align:right; font-weight:600; color: var(--ink); white-space:nowrap; padding-left: 10px; }
+
   /* FAQ */
+  .faq-list{ max-width: 680px; }
   .faq-item{ border-bottom: 1px solid var(--line); padding: 18px 0; }
   .faq-item:last-child{ border-bottom:none; }
   .faq-q{ font-family: var(--display); font-weight:700; font-size:15px; color: var(--ink); margin: 0 0 8px; display:flex; gap:10px; }
