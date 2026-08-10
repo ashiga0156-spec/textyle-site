@@ -245,7 +245,7 @@
   .process p{ margin:0; font-size:14px; color: var(--ink-soft); max-width: 52ch; }
 
   /* ---- profile timeline ---- */
-  .profile-text{ font-size:14.5px; color: var(--ink-soft); max-width:100ch; margin-bottom:40px; }
+  .profile-text{ font-size:14.5px; color: var(--ink-soft); max-width:110ch; margin-bottom:40px; }
   .profile-text strong{ color: var(--ink); }
   .timeline{ position:relative; display:flex; justify-content:space-between; padding-top: 10px; }
   .timeline::before{ content:""; position:absolute; top:14px; left:0; right:0; height:2px; background: var(--line); }
