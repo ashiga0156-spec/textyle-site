@@ -89,7 +89,7 @@
   }
   h1 em{ font-style:normal; color: var(--gold); }
   h1 .br-mobile{ display: none; }
-  .br-desktop-lede{ display: none; }
+  .br-wide{ display: none; }
   .lede{
     font-size: 15.5px;
     color: rgba(255,255,255,0.82);
@@ -101,7 +101,9 @@
   @media (min-width: 1080px){
     .hero .hero-grid{ max-width: 980px; }
     .hero .lede{ max-width: 760px; }
-    .br-desktop-lede{ display: inline; }
+    .br-wide{ display: inline; }
+    .profile-text{ max-width: 700px; }
+    .refnote p{ max-width: 620px; }
   }
 
   .tag-row{ display:flex; flex-wrap:wrap; gap:10px; margin-bottom: 40px; }
