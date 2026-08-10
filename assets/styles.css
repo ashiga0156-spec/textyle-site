@@ -100,7 +100,7 @@
 
   @media (min-width: 1080px){
     .hero .hero-grid{ max-width: 980px; }
-    .hero .lede{ max-width: 760px; }
+    .hero .lede{ max-width: 820px; }
     .br-wide{ display: inline; }
     .profile-text{ max-width: 700px; }
     .refnote p{ max-width: 620px; }
