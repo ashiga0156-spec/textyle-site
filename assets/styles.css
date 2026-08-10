@@ -91,6 +91,10 @@
   h1 .br-mobile{ display: none; }
   .br-wide{ display: none; }
   .br-narrow{ display: inline; }
+  .br-tablet{ display: none; }
+  @media (min-width: 721px) and (max-width: 1079px){
+    .br-tablet{ display: inline; }
+  }
   .lede{
     font-size: 15.5px;
     color: rgba(255,255,255,0.82);
