@@ -90,6 +90,7 @@
   h1 em{ font-style:normal; color: var(--gold); }
   h1 .br-mobile{ display: none; }
   .br-wide{ display: none; }
+  .br-narrow{ display: inline; }
   .lede{
     font-size: 15.5px;
     color: rgba(255,255,255,0.82);
@@ -102,8 +103,9 @@
     .hero .hero-grid{ max-width: 980px; }
     .hero .lede{ max-width: 820px; }
     .br-wide{ display: inline; }
+    .br-narrow{ display: none; }
     .profile-text{ max-width: 980px; }
-    .profile-text.pricing-note-2{ max-width: 700px; }
+    .profile-text.pricing-note-2{ max-width: 600px; }
     .refnote p{ max-width: 620px; }
   }
 
@@ -245,7 +247,7 @@
   .process p{ margin:0; font-size:14px; color: var(--ink-soft); max-width: 52ch; }
 
   /* ---- profile timeline ---- */
-  .profile-text{ font-size:14.5px; color: var(--ink-soft); max-width:110ch; margin-bottom:40px; }
+  .profile-text{ font-size:14.5px; color: var(--ink-soft); max-width:100ch; margin-bottom:40px; }
   .profile-text strong{ color: var(--ink); }
   .timeline{ position:relative; display:flex; justify-content:space-between; padding-top: 10px; }
   .timeline::before{ content:""; position:absolute; top:14px; left:0; right:0; height:2px; background: var(--line); }
@@ -415,6 +417,7 @@
   .faq-q{ font-family: var(--display); font-weight:700; font-size:15px; color: var(--ink); margin: 0 0 8px; display:flex; gap:10px; }
   .faq-q::before{ content:"Q"; color: var(--gold-deep); flex-shrink:0; }
   .faq-a{ font-size:14px; color: var(--ink-soft); margin:0; padding-left: 24px; }
+  .faq-cta-note{ max-width: 840px; margin: 28px 0 0; padding-top: 22px; border-top: 1px solid var(--line); font-size:15px; font-weight:600; color: var(--navy); text-align:center; }
 
   /* inline CTA within article */
   .article-cta{
