@@ -166,6 +166,7 @@
   section.tint{ background: var(--paper-tint); }
 
   .section-head{ margin-bottom: 40px; max-width: 62ch; }
+  #specialty .section-head{ max-width: 750px; }
   .section-head .eyebrow{ color: var(--gold-deep); }
   h2{
     font-family: var(--display);
