@@ -235,7 +235,7 @@
   .process p{ margin:0; font-size:14px; color: var(--ink-soft); max-width: 52ch; }
 
   /* ---- profile timeline ---- */
-  .profile-text{ font-size:14.5px; color: var(--ink-soft); max-width:62ch; margin-bottom:40px; }
+  .profile-text{ font-size:14.5px; color: var(--ink-soft); max-width:75ch; margin-bottom:40px; }
   .profile-text strong{ color: var(--ink); }
   .timeline{ position:relative; display:flex; justify-content:space-between; padding-top: 10px; }
   .timeline::before{ content:""; position:absolute; top:14px; left:0; right:0; height:2px; background: var(--line); }
@@ -257,7 +257,7 @@
     display:flex; gap:20px; flex-wrap:wrap; align-items:flex-start;
   }
   .refnote h3{ font-family: var(--display); font-weight:700; font-size:16px; margin:0 0 10px; color: var(--ink); }
-  .refnote p{ font-size:14px; color: var(--ink-soft); margin:0 0 12px; max-width:56ch; }
+  .refnote p{ font-size:14px; color: var(--ink-soft); margin:0 0 12px; max-width:70ch; }
   .refnote a{ font-family: var(--body); font-size:13.5px; font-weight:500; text-decoration:none; color: var(--navy); border-bottom:1px solid var(--navy-soft); }
   .refnote a:hover{ color: var(--gold-deep); border-color: var(--gold-deep); }
 
@@ -399,7 +399,7 @@
   table.price-table td:last-child{ text-align:right; font-weight:600; color: var(--ink); white-space:nowrap; padding-left: 10px; }
 
   /* FAQ */
-  .faq-list{ max-width: 680px; }
+  .faq-list{ max-width: 840px; }
   .faq-item{ border-bottom: 1px solid var(--line); padding: 18px 0; }
   .faq-item:last-child{ border-bottom:none; }
   .faq-q{ font-family: var(--display); font-weight:700; font-size:15px; color: var(--ink); margin: 0 0 8px; display:flex; gap:10px; }
