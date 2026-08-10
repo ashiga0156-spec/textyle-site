@@ -68,6 +68,7 @@
   .hero-grid{
     max-width: 640px;
   }
+  .hero .hero-grid{ max-width: 800px; }
   .eyebrow{
     font-family: var(--latin);
     font-weight:600;
