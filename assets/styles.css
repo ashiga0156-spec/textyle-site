@@ -109,7 +109,7 @@
     .br-wide{ display: inline; }
     .br-narrow{ display: none; }
     .profile-text{ max-width: 980px; }
-    .profile-text.pricing-note-2{ max-width: 600px; }
+    .profile-text.pricing-note-2{ max-width: 850px; }
     .refnote p{ max-width: 620px; }
   }
 
