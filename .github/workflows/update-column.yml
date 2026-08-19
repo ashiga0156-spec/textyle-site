@@ -12,6 +12,12 @@ on:
 permissions:
   contents: write
 
+# 複数の記事ファイルをほぼ同時にpushした場合、ワークフローが並列に走って
+# git push が競合(fetch first)するのを防ぐため、実行を1本ずつ順番に処理する。
+concurrency:
+  group: update-column-${{ github.ref }}
+  cancel-in-progress: false
+
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -33,4 +39,11 @@ jobs:
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git add column/index.html sitemap.xml
           git diff --staged --quiet || git commit -m "chore: auto-update column index & sitemap"
-          git push
+
+          # concurrency設定で通常は競合しないはずだが、念のためpush前にrebaseし、
+          # それでも失敗した場合は数回リトライする(保険)。
+          for i in 1 2 3; do
+            git pull --rebase origin "${GITHUB_REF_NAME}" && git push && break
+            echo "push failed, retrying ($i)..."
+            sleep 3
+          done
