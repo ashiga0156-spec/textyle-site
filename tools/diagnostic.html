@@ -139,6 +139,18 @@
   .hint{ font-size:11px; color:var(--ink-soft); margin-top:5px; }
   .err{ font-size:12px; color:var(--bad); margin-top:6px; font-weight:600; display:none; }
 
+  .charcounter{
+    font-family: var(--font-mono);
+    font-size:11.5px;
+    font-weight:600;
+    margin-top:6px;
+    color: var(--ink-soft);
+    transition: color 0.15s ease;
+  }
+  .charcounter.state-bad{ color: var(--bad); }
+  .charcounter.state-warn{ color: var(--warn); }
+  .charcounter.state-good{ color: var(--good); }
+
   .stampbtn{
     width:100%;
     font-family: var(--font-display);
@@ -204,6 +216,34 @@
 
   .gaugecard{ position:relative; text-align:center; overflow:visible; }
   .gaugewrap{ max-width:280px; margin:0 auto; }
+  .verdictnote{
+    font-size:12.5px;
+    color: var(--ink-soft);
+    line-height:1.7;
+    text-align:left;
+    margin:14px 0 0;
+    padding-top:14px;
+    border-top:1px solid var(--line-soft);
+  }
+  .recslead{
+    font-size:12.5px;
+    color: var(--ink-soft);
+    line-height:1.6;
+    margin:0 0 16px;
+  }
+  .weakflag{
+    display:inline-block;
+    font-family: var(--font-mono);
+    font-size:10px;
+    font-weight:600;
+    color: var(--bad);
+    background: var(--bad-soft);
+    border-radius:2px;
+    padding:2px 6px;
+    margin-left:8px;
+    letter-spacing:0.02em;
+    vertical-align:middle;
+  }
   .scoretext{
     font-family: var(--font-mono);
     font-weight:600;
@@ -242,6 +282,18 @@
   .stamp .s1{ font-size:9px; letter-spacing:0.15em; }
   .stamp .s2{ font-size:14px; font-weight:700; margin:2px 0; }
   .stamp .s3{ font-size:8px; letter-spacing:0.2em; }
+
+  .radarwrap{ max-width:260px; margin:0 auto 22px; }
+  .radarlabel{
+    font-family: var(--font-mono);
+    font-size:11px;
+    font-weight:500;
+    fill: var(--ink-soft);
+  }
+  .radarlabel .rl-score{
+    font-weight:600;
+    fill: var(--ink);
+  }
 
   .critrow{
     padding: 14px 0;
@@ -314,6 +366,17 @@
     margin-right:9px;
     width:15px; height:15px;
     flex-shrink:0;
+  }
+
+  .datanote{
+    font-size:11px;
+    color: var(--ink-soft);
+    line-height:1.7;
+    background: var(--paper);
+    border:1px solid var(--line-soft);
+    border-radius:3px;
+    padding:10px 12px;
+    margin:16px 0;
   }
 
   .edititem{
@@ -399,6 +462,45 @@
     box-shadow: 3px 3px 0 var(--accent);
   }
 
+  .ctabtn-secondary{
+    display:inline-block;
+    font-family: var(--font-body);
+    font-weight:600;
+    font-size:12.5px;
+    color: var(--ink-soft);
+    background: transparent;
+    border:1px dashed var(--line);
+    border-radius:3px;
+    padding:9px 18px;
+    margin:12px 0 0;
+    cursor:pointer;
+  }
+  .ctabtn-secondary:hover{ color: var(--accent); border-color: var(--accent); }
+
+  .ctahint{
+    font-size:11px;
+    color: var(--ink-soft);
+    line-height:1.6;
+    margin-top:8px;
+  }
+
+  .copyfeedback{
+    font-size:12px;
+    font-weight:600;
+    color: var(--good);
+    height:0;
+    opacity:0;
+    overflow:hidden;
+    transition: opacity 0.2s ease;
+    margin-top:0;
+  }
+  .copyfeedback.show{
+    height:auto;
+    opacity:1;
+    margin-top:8px;
+  }
+  .copyfeedback.show.is-error{ color: var(--bad); }
+
   .errorbox{
     display:none;
     background: var(--bad-soft);
@@ -409,6 +511,24 @@
     font-size:13px;
     margin-bottom:20px;
   }
+  .errorbox .errordetail{
+    display:block;
+    margin-top:6px;
+  }
+  .retrybtn{
+    display:block;
+    font-family: var(--font-body);
+    font-weight:700;
+    font-size:12.5px;
+    color: var(--bad);
+    background: var(--surface);
+    border:1px solid var(--bad);
+    border-radius:3px;
+    padding:8px 14px;
+    margin-top:10px;
+    cursor:pointer;
+  }
+  .retrybtn:hover{ background: var(--bad); color:#fff; }
 
   .precheckwarn{
     background: var(--warn-soft);
@@ -479,7 +599,8 @@
     <div class="field">
       <label for="f-body">記事本文</label>
       <textarea id="f-body" placeholder="診断したい記事の本文をそのまま貼り付けてください（200文字以上推奨）"></textarea>
-      <div class="hint">URLの読み込みには対応していません。本文をコピー＆ペーストしてください。</div>
+      <div class="charcounter" id="charcounter">現在 0文字（あと200文字必要です）</div>
+      <div class="hint">URLの読み込みには対応していません。本文をコピー＆ペーストしてください。推奨文字数の目安：2,000〜8,000文字程度。</div>
       <div class="err" id="f-err">本文を200文字以上入力してください。</div>
     </div>
     <div class="field">
@@ -511,6 +632,9 @@
         </div>
       </div>
     </div>
+    <div class="datanote">
+      入力された記事本文は保存されません。診断処理のため、AI（Claude）へ一時的に送信されます。診断結果はAIによる評価であり、検索順位や専門的な正確性を保証するものではありません。
+    </div>
     <button class="stampbtn" id="submitbtn">診断を開始する</button>
     <button class="ghostbtn" id="samplebtn">サンプル結果を見る（無料版プレビュー）</button>
     <div class="scanline" id="scanline"></div>
@@ -533,10 +657,12 @@
       <div class="gaugewrap">
         <svg id="gauge" viewBox="0 0 240 150" width="100%"></svg>
       </div>
+      <p class="verdictnote" id="verdictnote"></p>
     </div>
 
     <div class="card">
       <h2>5つの診断基準</h2>
+      <div class="radarwrap"><svg id="radar" viewBox="0 0 300 300" width="100%"></svg></div>
       <div id="criteria"></div>
     </div>
 
@@ -547,6 +673,7 @@
 
     <div class="card">
       <h2>優先改善提案</h2>
+      <p class="recslead" id="recslead"></p>
       <div id="recs"></div>
     </div>
 
@@ -554,6 +681,9 @@
       <h2>この記事を実際にどう直すか、具体的に知りたい方へ</h2>
       <p class="ctatext">この無料診断は、記事の弱点を数値で示すところまでです。「どこを」「どう直せば」検索評価も専門性も上がるのか——一級土木施工管理技士による赤字修正案つきの本格監修サービスをご提供しています。</p>
       <a class="ctabtn" href="mailto:a.shiga@textyle-ni.net?subject=%E8%A8%BA%E6%96%AD%E3%83%84%E3%83%BC%E3%83%AB%E3%81%8B%E3%82%89%E3%81%AE%E3%81%8A%E5%95%8F%E3%81%84%E5%90%88%E3%82%8F%E3%81%9B&body=TEXTYLE%E6%A7%98%0D%0A%0D%0A%E8%A8%BA%E6%96%AD%E3%83%84%E3%83%BC%E3%83%AB%E3%82%92%E8%A9%A6%E3%81%97%E3%80%81%E6%9C%AC%E6%A0%BC%E7%9B%A3%E4%BF%AE%E3%82%B5%E3%83%BC%E3%83%93%E3%82%B9%E3%81%AB%E3%81%A4%E3%81%84%E3%81%A6%E3%81%8A%E4%BC%BA%E3%81%84%E3%81%97%E3%81%9F%E3%81%84%E3%81%A7%E3%81%99%E3%80%82">TEXTYLEに相談する（メールを開く）</a>
+      <button type="button" class="ctabtn-secondary" id="copyresultbtn">診断結果をコピーする</button>
+      <div class="ctahint">メールソフトが開かない場合は、上のボタンで結果をコピーしてから、普段お使いのメールで直接お送りください。</div>
+      <div class="copyfeedback" id="copyfeedback"></div>
     </div>
   </div>
 </div>
@@ -576,6 +706,21 @@ const THEME_CHECKS = {
   "解体工事": "アスベスト（石綿）事前調査の実施義務（石綿障害予防規則）に触れているか。建設リサイクル法に基づく届出（一定規模以上の解体工事は都道府県への事前届出が必要）への言及があるか。近隣対策（振動・騒音・粉じん対策、養生）の記述が具体的か。産業廃棄物の適正処理・マニフェスト管理への言及があるか。作業員の安全対策（倒壊・崩落を防ぐ解体順序や支保工、重機による事故防止、有害物質への暴露防止装備等）への言及があるか。",
   "その他建設関連": "建設・住宅分野の一般的な技術記述として、明らかな誤りや曖昧な表現がないか。"
 };
+
+async function fetchWithTimeout(url, options, timeoutMs){
+  const controller = new AbortController();
+  const timer = setTimeout(()=> controller.abort(), timeoutMs);
+  try{
+    return await fetch(url, Object.assign({}, options, { signal: controller.signal }));
+  }catch(err){
+    if(err.name === 'AbortError'){
+      throw new Error('TIMEOUT');
+    }
+    throw err;
+  }finally{
+    clearTimeout(timer);
+  }
+}
 
 function bandColor(score){
   if(score >= 80) return {c:'good', label:'合格レベル'};
@@ -633,6 +778,68 @@ function renderGauge(score){
   });
 }
 
+const RADAR_SHORT_LABELS = {
+  "一次情報の深さ": "一次情報",
+  "技術的正確性": "正確性",
+  "信頼シグナル（E-E-A-T）": "信頼性",
+  "検索意図との整合性": "検索意図",
+  "構造・内部リンク": "構造"
+};
+
+function renderRadar(criteria){
+  const svg = document.getElementById('radar');
+  if(!svg) return;
+  if(!criteria || criteria.length < 3){ svg.innerHTML = ''; return; }
+
+  const cx = 150, cy = 150, maxR = 82;
+  const n = criteria.length;
+  const angles = criteria.map((_, i) => 90 - i * (360 / n));
+
+  let grid = '';
+  [20, 40, 60, 80, 100].forEach(pct => {
+    const pts = angles.map(a => { const p = polar(cx, cy, maxR * pct / 100, a); return `${p.x},${p.y}`; }).join(' ');
+    grid += `<polygon points="${pts}" fill="none" stroke="var(--line-soft)" stroke-width="1"/>`;
+  });
+
+  let axes = '';
+  angles.forEach(a => {
+    const p = polar(cx, cy, maxR, a);
+    axes += `<line x1="${cx}" y1="${cy}" x2="${p.x}" y2="${p.y}" stroke="var(--line)" stroke-width="1"/>`;
+  });
+
+  const dataPts = criteria.map((item, i) => polar(cx, cy, maxR * Math.max(0, Math.min(100, item.score)) / 100, angles[i]));
+  const dataPolygon = dataPts.map(p => `${p.x},${p.y}`).join(' ');
+
+  let dots = '';
+  criteria.forEach((item, i) => {
+    const b = bandColor(item.score);
+    const p = dataPts[i];
+    dots += `<circle cx="${p.x}" cy="${p.y}" r="3.5" fill="var(--${b.c})" stroke="var(--surface)" stroke-width="1.5"/>`;
+  });
+
+  let labels = '';
+  criteria.forEach((item, i) => {
+    const a = angles[i];
+    const p = polar(cx, cy, maxR + 32, a);
+    const cos = Math.cos(a * Math.PI / 180);
+    let anchor = 'middle';
+    if(cos > 0.3) anchor = 'start';
+    else if(cos < -0.3) anchor = 'end';
+    const b = bandColor(item.score);
+    const label = RADAR_SHORT_LABELS[item.name] || item.name.slice(0, 4);
+    labels += `<text x="${p.x}" y="${p.y - 4}" text-anchor="${anchor}" class="radarlabel">${label}</text>`;
+    labels += `<text x="${p.x}" y="${p.y + 10}" text-anchor="${anchor}" class="radarlabel rl-score" style="fill:var(--${b.c})">${item.score}</text>`;
+  });
+
+  svg.innerHTML = `
+    ${grid}
+    ${axes}
+    <polygon points="${dataPolygon}" fill="var(--accent)" fill-opacity="0.16" stroke="var(--accent)" stroke-width="2" stroke-linejoin="round"/>
+    ${dots}
+    ${labels}
+  `;
+}
+
 function renderEdits(edits){
   const card = document.getElementById('editcard');
   const wrap = document.getElementById('edits');
@@ -657,7 +864,12 @@ function renderEdits(edits){
   card.style.display = 'block';
 }
 
+let lastResultData = null;
+let lastReportId = '';
+
 function renderResults(data){
+  lastResultData = data;
+
   const mismatchEl = document.getElementById('mismatchwarn');
   if(data.theme_mismatch){
     mismatchEl.innerHTML = '<strong>⚠ テーマの選択が合っていない可能性があります</strong>' + data.theme_mismatch + ' テーマを選び直して再診断することをおすすめします。';
@@ -671,22 +883,39 @@ function renderResults(data){
   document.getElementById('stamp').style.color = `var(--${band.c})`;
   document.getElementById('stamp-verdict').textContent = data.verdict || band.label;
 
+  const VERDICT_NOTES = {
+    good: '専門性・検索評価ともに高い水準です。このまま公開して問題ありません。さらに磨きたい場合は、下の「優先改善提案」を参考にしてください。',
+    warn: '土台はできていますが、いくつかの点で改善の余地があります。下の「5つの診断基準」で特にスコアが低い項目を中心に、「優先改善提案」に沿って手を入れると評価を引き上げられます。',
+    bad: '現状のままでは、専門性・検索評価の両面で見劣りする可能性があります。下の「優先改善提案」を中心に、重点的な見直しをおすすめします。'
+  };
+  document.getElementById('verdictnote').textContent = VERDICT_NOTES[band.c] || '';
+
   const now = new Date();
   const id = 'TX-' + now.getFullYear() + String(now.getMonth()+1).padStart(2,'0') + String(now.getDate()).padStart(2,'0') + '-' + Math.floor(1000+Math.random()*9000);
+  lastReportId = id;
   document.getElementById('reportno').textContent = 'REPORT No. ' + id;
 
   renderGauge(data.overall_score);
+  renderRadar(data.criteria);
   renderEdits(data.edits);
 
   const critWrap = document.getElementById('criteria');
   critWrap.innerHTML = '';
-  (data.criteria||[]).forEach(item=>{
+  const critList = data.criteria || [];
+  let weakestItem = null;
+  critList.forEach(item=>{
+    if(bandColor(item.score).c !== 'good' && (!weakestItem || item.score < weakestItem.score)){
+      weakestItem = item;
+    }
+  });
+  critList.forEach(item=>{
     const b = bandColor(item.score);
+    const isWeakest = weakestItem && item === weakestItem;
     const row = document.createElement('div');
     row.className = 'critrow';
     row.innerHTML = `
       <div class="rowtop">
-        <span class="name">${item.name}</span>
+        <span class="name">${item.name}${isWeakest ? '<span class="weakflag">要改善ポイント</span>' : ''}</span>
         <span class="score" style="color:var(--${b.c})">${item.score} / 100</span>
       </div>
       <div class="bar"><div class="barfill" style="background:var(--${b.c})"></div></div>
@@ -699,6 +928,11 @@ function renderResults(data){
     });
   });
 
+  const recsLeadEl = document.getElementById('recslead');
+  recsLeadEl.textContent = weakestItem
+    ? `特に「${weakestItem.name}」（${weakestItem.score}点）を中心に、次の順で改善すると効果的です。`
+    : 'スコアをさらに伸ばすなら、次の点から着手すると効果的です。';
+
   const recWrap = document.getElementById('recs');
   recWrap.innerHTML = '';
   (data.recommendations||[]).forEach((r,i)=>{
@@ -710,6 +944,70 @@ function renderResults(data){
 
   document.getElementById('results').style.display = 'block';
   document.getElementById('results').scrollIntoView({behavior:'smooth', block:'start'});
+}
+
+function buildResultText(){
+  if(!lastResultData) return '';
+  const d = lastResultData;
+  const band = bandColor(d.overall_score);
+  const lines = [];
+  lines.push('【TEXTYLE 住宅・建設コンテンツ診断結果】');
+  if(lastReportId) lines.push('REPORT No. ' + lastReportId);
+  lines.push('');
+  lines.push(`総合スコア：${d.overall_score} / 100（${d.verdict || band.label}）`);
+  lines.push('');
+  (d.criteria || []).forEach(item => {
+    lines.push(`■${item.name}：${item.score} / 100`);
+    if(item.comment) lines.push(item.comment);
+    lines.push('');
+  });
+  if(d.recommendations && d.recommendations.length){
+    lines.push('【優先改善提案】');
+    d.recommendations.forEach((r, i) => lines.push(`${i+1}. ${r}`));
+    lines.push('');
+  }
+  lines.push('---');
+  lines.push('この結果についてTEXTYLE（志賀玲）にご相談したい方は、このテキストをメール本文に貼り付けてお送りください。');
+  lines.push('a.shiga@textyle-ni.net');
+  return lines.join('\n');
+}
+
+function copyResultText(){
+  const text = buildResultText();
+  const feedback = document.getElementById('copyfeedback');
+  if(!text){ return; }
+
+  const showFeedback = (msg, isError) => {
+    feedback.textContent = msg;
+    feedback.className = 'copyfeedback show' + (isError ? ' is-error' : '');
+    clearTimeout(copyResultText._t);
+    copyResultText._t = setTimeout(()=>{ feedback.className = 'copyfeedback'; }, 2500);
+  };
+
+  if(navigator.clipboard && navigator.clipboard.writeText){
+    navigator.clipboard.writeText(text)
+      .then(()=> showFeedback('コピーしました。メールに貼り付けてお送りください。', false))
+      .catch(()=> fallbackCopy(text, showFeedback));
+  }else{
+    fallbackCopy(text, showFeedback);
+  }
+}
+
+function fallbackCopy(text, showFeedback){
+  try{
+    const ta = document.createElement('textarea');
+    ta.value = text;
+    ta.style.position = 'fixed';
+    ta.style.opacity = '0';
+    document.body.appendChild(ta);
+    ta.focus();
+    ta.select();
+    document.execCommand('copy');
+    document.body.removeChild(ta);
+    showFeedback('コピーしました。メールに貼り付けてお送りください。', false);
+  }catch(e){
+    showFeedback('コピーに失敗しました。お手数ですが手動で選択してコピーしてください。', true);
+  }
 }
 
 const THEME_KEYWORDS = {
@@ -855,7 +1153,7 @@ ${baseSchema}`;
   const userContent = `業種：${industry}\nタイトル：${title || '（未入力）'}\n\n本文：\n${body}`;
 
   try{
-    const response = await fetch("https://textyle-diagnostic.a-shiga0156.workers.dev", {
+    const response = await fetchWithTimeout("https://textyle-diagnostic.a-shiga0156.workers.dev", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
@@ -864,7 +1162,7 @@ ${baseSchema}`;
         system: systemPrompt,
         messages: [{ role: "user", content: userContent }]
       })
-    });
+    }, 45000);
 
     const data = await response.json();
 
@@ -888,8 +1186,25 @@ ${baseSchema}`;
     renderResults(parsed);
   }catch(e){
     console.error('診断エラー詳細:', e);
-    errorBox.innerHTML = '診断を完了できませんでした。<br><span style="font-family:var(--font-mono);font-size:11px;opacity:0.85;">' + String(e.message || e).replace(/</g,'&lt;') + '</span>';
+    let friendly;
+    if(e.message === 'TIMEOUT'){
+      friendly = '診断処理がタイムアウトしました（45秒経過）。サーバーが混み合っている可能性があります。少し時間をおいて、もう一度お試しください。';
+    }else if(e instanceof TypeError){
+      friendly = 'ネットワークに接続できませんでした。通信環境をご確認のうえ、もう一度お試しください。';
+    }else{
+      friendly = '診断を完了できませんでした。時間をおいて、もう一度お試しください。';
+    }
+    errorBox.innerHTML = `
+      <div>${friendly}</div>
+      <span class="errordetail" style="font-family:var(--font-mono);font-size:11px;opacity:0.85;">${String(e.message || e).replace(/</g,'&lt;')}</span>
+      <button type="button" class="retrybtn" id="retrybtn">もう一度試す</button>
+    `;
     errorBox.style.display = 'block';
+    errorBox.scrollIntoView({behavior:'smooth', block:'center'});
+    document.getElementById('retrybtn').addEventListener('click', ()=>{
+      errorBox.style.display = 'none';
+      runDiagnosis(true);
+    });
   }finally{
     btn.disabled = false;
     btn.textContent = '診断を開始する';
@@ -914,12 +1229,39 @@ const SAMPLE_RESULT = {
   ]
 };
 
+function updateCharCounter(){
+  const body = document.getElementById('f-body').value;
+  const len = body.length;
+  const counter = document.getElementById('charcounter');
+  const fmt = n => n.toLocaleString('ja-JP');
+
+  let text, state;
+  if(len < 200){
+    text = `現在 ${fmt(len)}文字（あと${fmt(200 - len)}文字必要です）`;
+    state = 'state-bad';
+  }else if(len < 2000){
+    text = `現在 ${fmt(len)}文字（診断可能です。推奨は2,000〜8,000文字程度）`;
+    state = 'state-warn';
+  }else if(len <= 8000){
+    text = `現在 ${fmt(len)}文字（推奨文字数の範囲内です）`;
+    state = 'state-good';
+  }else{
+    text = `現在 ${fmt(len)}文字（推奨の8,000文字を超えています。長すぎる場合、診断精度が落ちることがあります）`;
+    state = 'state-warn';
+  }
+  counter.textContent = text;
+  counter.className = 'charcounter ' + state;
+}
+document.getElementById('f-body').addEventListener('input', updateCharCounter);
+updateCharCounter();
+
 document.getElementById('samplebtn').addEventListener('click', ()=>{
   document.getElementById('errorbox').style.display = 'none';
   renderResults(SAMPLE_RESULT);
 });
 
 document.getElementById('submitbtn').addEventListener('click', runDiagnosis);
+document.getElementById('copyresultbtn').addEventListener('click', copyResultText);
 </script>
 
 </body>
