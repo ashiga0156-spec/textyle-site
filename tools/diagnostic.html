@@ -1137,6 +1137,7 @@ async function runDiagnosis(skipPrecheck){
 ①記事本文の具体的にどの記述を見てそう判断したか
 ②広く確立された一般原則（例：新耐震基準の区分、労働安全衛生法の基本的な考え方、E-E-A-Tの考え方など）
 条文番号・規格番号・数値基準など、正確に断定できない細部は引用しないこと。断定できない場合は「一般的な業界慣行として」のように一般化して表現すること。
+本文から語句を引用する場合は必ず「」（かぎ括弧）で囲み、ダブルクォート(")は本文引用も含め一切使用しないこと（JSON形式が壊れるため）。
 
 採点の一貫性を保つため、各基準で共通して次の目安を用いてください：
 - 90〜100点：具体的な数値・事例・専門的根拠が複数示され、業界基準に照らして誤りがない
@@ -1153,22 +1154,32 @@ ${baseSchema}`;
   const userContent = `業種：${industry}\nタイトル：${title || '（未入力）'}\n\n本文：\n${body}`;
 
   try{
-    const response = await fetchWithTimeout("https://textyle-diagnostic.a-shiga0156.workers.dev", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        model: "claude-sonnet-5",
-        max_tokens: 1500,
-        system: systemPrompt,
-        messages: [{ role: "user", content: userContent }]
-      })
-    }, 45000);
+    const callApi = async (maxTokens) => {
+      const res = await fetchWithTimeout("https://textyle-diagnostic.a-shiga0156.workers.dev", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          model: "claude-sonnet-5",
+          max_tokens: maxTokens,
+          system: systemPrompt,
+          messages: [{ role: "user", content: userContent }]
+        })
+      }, 45000);
+      const json = await res.json();
+      if(!res.ok || json.error){
+        const msg = (json.error && json.error.message) ? json.error.message : ('HTTPステータス ' + res.status);
+        throw new Error('APIエラー: ' + msg);
+      }
+      return json;
+    };
 
-    const data = await response.json();
+    // edit（赤字修正案）モードはedits配列の分だけ出力が長くなるため上限を分ける
+    const baseMaxTokens = mode === 'edit' ? 3500 : 2200;
+    let data = await callApi(baseMaxTokens);
 
-    if(!response.ok || data.error){
-      const msg = (data.error && data.error.message) ? data.error.message : ('HTTPステータス ' + response.status);
-      throw new Error('APIエラー: ' + msg);
+    // 出力が長さ上限で切れて途中終了した場合は、上限を上げて1回だけ再試行する
+    if(data.stop_reason === 'max_tokens'){
+      data = await callApi(baseMaxTokens + 1500);
     }
 
     const textBlocks = (data.content || []).filter(b => b.type === 'text').map(b => b.text).join('\n');
@@ -1181,7 +1192,8 @@ ${baseSchema}`;
     try{
       parsed = JSON.parse(cleaned);
     }catch(parseErr){
-      throw new Error('JSON解析エラー。モデルの生出力: ' + cleaned.slice(0,400));
+      const truncNote = data.stop_reason === 'max_tokens' ? '（出力が長さ上限で途中で切れています。再試行後も発生する場合はmax_tokensのさらなる引き上げが必要です）' : '';
+      throw new Error('JSON解析エラー' + truncNote + '。モデルの生出力: ' + cleaned.slice(0,400));
     }
     renderResults(parsed);
   }catch(e){
