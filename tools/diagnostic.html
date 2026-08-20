@@ -777,6 +777,60 @@ const THEME_CHECKS = {
   "その他建設関連": "建設・住宅分野の一般的な技術記述として、明らかな誤りや曖昧な表現がないか。"
 };
 
+function escapeHtml(value){
+  if(value === null || value === undefined) return '';
+  return String(value)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+}
+
+function sanitizeJsonText(text){
+  let result = '';
+  let inString = false;
+  let escape = false;
+  for(let i = 0; i < text.length; i++){
+    const ch = text[i];
+    if(inString){
+      if(escape){
+        result += ch;
+        escape = false;
+        continue;
+      }
+      if(ch === '\\'){
+        result += ch;
+        escape = true;
+        continue;
+      }
+      if(ch === '"'){
+        inString = false;
+        result += ch;
+        continue;
+      }
+      if(ch === '\n'){
+        result += '\\n';
+        continue;
+      }
+      if(ch === '\r'){
+        continue;
+      }
+      if(ch === '\t'){
+        result += '\\t';
+        continue;
+      }
+      result += ch;
+    }else{
+      if(ch === '"'){
+        inString = true;
+      }
+      result += ch;
+    }
+  }
+  return result;
+}
+
 async function fetchWithTimeout(url, options, timeoutMs){
   const controller = new AbortController();
   const timer = setTimeout(()=> controller.abort(), timeoutMs);
@@ -924,10 +978,10 @@ function renderEdits(edits){
     el.innerHTML = `
       <div class="edit-mark">該当箇所 ${String(i+1).padStart(2,'0')}</div>
       <div class="edit-sublabel">原文</div>
-      <span class="edit-before">${e.original}</span>
+      <span class="edit-before">${escapeHtml(e.original)}</span>
       <div class="edit-sublabel">修正案</div>
-      <span class="edit-after">${e.revised}</span>
-      <div class="edit-reason">${e.reason}</div>
+      <span class="edit-after">${escapeHtml(e.revised)}</span>
+      <div class="edit-reason">${escapeHtml(e.reason)}</div>
     `;
     wrap.appendChild(el);
   });
@@ -942,7 +996,7 @@ function renderResults(data){
 
   const mismatchEl = document.getElementById('mismatchwarn');
   if(data.theme_mismatch){
-    mismatchEl.innerHTML = '<strong>⚠ テーマの選択が合っていない可能性があります</strong>' + data.theme_mismatch + ' テーマを選び直して再診断することをおすすめします。';
+    mismatchEl.innerHTML = '<strong>⚠ テーマの選択が合っていない可能性があります</strong>' + escapeHtml(data.theme_mismatch) + ' テーマを選び直して再診断することをおすすめします。';
     mismatchEl.style.display = 'block';
   }else{
     mismatchEl.style.display = 'none';
@@ -979,22 +1033,25 @@ function renderResults(data){
     }
   });
   critList.forEach(item=>{
-    const b = bandColor(item.score);
+    const score = Number(item.score);
+    const safeScore = Number.isFinite(score) ? Math.max(0, Math.min(100, score)) : 0;
+    const b = bandColor(safeScore);
     const isWeakest = weakestItem && item === weakestItem;
     const row = document.createElement('div');
     row.className = 'critrow';
     row.innerHTML = `
       <div class="rowtop">
-        <span class="name">${item.name}${isWeakest ? '<span class="weakflag">要改善ポイント</span>' : ''}</span>
-        <span class="score" style="color:var(--${b.c})">${item.score} / 100</span>
+        <span class="name">${escapeHtml(item.name)}${isWeakest ? '<span class="weakflag">要改善ポイント</span>' : ''}</span>
+        <span class="score" style="color:var(--${b.c})">${safeScore} / 100</span>
       </div>
       <div class="bar"><div class="barfill" style="background:var(--${b.c})"></div></div>
-      <div class="comment">${item.comment}</div>
-      ${item.basis ? `<div class="basis"><span class="basis-label">根拠</span>${item.basis}</div>` : ''}
+      <div class="comment">${escapeHtml(item.comment)}</div>
+      ${item.basis ? `<div class="basis"><span class="basis-label">根拠</span>${escapeHtml(item.basis)}</div>` : ''}
     `;
     critWrap.appendChild(row);
     requestAnimationFrame(()=>{
-      row.querySelector('.barfill').style.width = item.score + '%';
+      const fill = row.querySelector('.barfill');
+      if(fill) fill.style.width = safeScore + '%';
     });
   });
 
@@ -1010,15 +1067,16 @@ function renderResults(data){
   (data.recommendations||[]).forEach((r,i)=>{
     const isObj = r && typeof r === 'object';
     const text = isObj ? r.text : r;
-    const priority = isObj ? r.priority : null;
-    const badgeClass = PRIORITY_CLASS[priority] || 'prio-mid';
+    const rawPriority = isObj ? r.priority : null;
+    const priority = (rawPriority && PRIORITY_CLASS[rawPriority]) ? rawPriority : null;
+    const badgeClass = priority ? PRIORITY_CLASS[priority] : 'prio-mid';
     const el = document.createElement('div');
     el.className = 'recitem';
     el.innerHTML = `
       <span class="recnum">${String(i+1).padStart(2,'0')}</span>
       <div class="recbody">
-        ${priority ? `<span class="priobadge ${badgeClass}">優先度：${priority}</span><br>` : ''}
-        <span class="rectext">${text}</span>
+        ${priority ? `<span class="priobadge ${badgeClass}">優先度：${escapeHtml(priority)}</span><br>` : ''}
+        <span class="rectext">${escapeHtml(text)}</span>
       </div>
     `;
     recWrap.appendChild(el);
@@ -1259,7 +1317,7 @@ ${baseSchema}`;
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         model: "claude-sonnet-5",
-        max_tokens: 2000,
+        max_tokens: 3000,
         thinking: { type: "disabled" },
         system: systemPrompt,
         messages: [{ role: "user", content: userContent }]
@@ -1278,12 +1336,23 @@ ${baseSchema}`;
       throw new Error('レスポンスにテキストが含まれていません: ' + JSON.stringify(data).slice(0,300));
     }
     const cleaned = textBlocks.replace(/```json/g,'').replace(/```/g,'').trim();
+    console.log('[診断デバッグ] stop_reason:', data.stop_reason, '/ usage:', JSON.stringify(data.usage || {}));
+    console.log('[診断デバッグ] AI生出力（全文）:', cleaned);
+
+    if(data.stop_reason === 'max_tokens'){
+      throw new Error('MAX_TOKENS');
+    }
 
     let parsed;
     try{
       parsed = JSON.parse(cleaned);
     }catch(parseErr){
-      throw new Error('JSON解析エラー。モデルの生出力: ' + cleaned.slice(0,400));
+      try{
+        parsed = JSON.parse(sanitizeJsonText(cleaned));
+        console.warn('[診断デバッグ] 直接のJSON解析には失敗しましたが、サニタイズ後の解析に成功しました。生出力を確認してください。');
+      }catch(parseErr2){
+        throw new Error('JSON解析エラー（stop_reason: ' + (data.stop_reason || '不明') + '）。全文はブラウザのコンソール（F12）に出力済み。\n先頭400字: ' + cleaned.slice(0,400) + '\n\n末尾200字: ' + cleaned.slice(-200));
+      }
     }
     renderResults(parsed);
   }catch(e){
@@ -1291,6 +1360,8 @@ ${baseSchema}`;
     let friendly;
     if(e.message === 'TIMEOUT'){
       friendly = '診断処理がタイムアウトしました（45秒経過）。サーバーが混み合っている可能性があります。少し時間をおいて、もう一度お試しください。';
+    }else if(e.message === 'MAX_TOKENS'){
+      friendly = '診断結果が長くなりすぎて、出力が途中で切れました。記事を短くするか、時間をおいてもう一度お試しください。';
     }else if(e instanceof TypeError){
       friendly = 'ネットワークに接続できませんでした。通信環境をご確認のうえ、もう一度お試しください。';
     }else{
@@ -1298,7 +1369,7 @@ ${baseSchema}`;
     }
     errorBox.innerHTML = `
       <div>${friendly}</div>
-      <span class="errordetail" style="font-family:var(--font-mono);font-size:11px;opacity:0.85;">${String(e.message || e).replace(/</g,'&lt;')}</span>
+      <span class="errordetail" style="font-family:var(--font-mono);font-size:11px;opacity:0.85;white-space:pre-wrap;">${escapeHtml(e.message || e)}</span>
       <button type="button" class="retrybtn" id="retrybtn">もう一度試す</button>
     `;
     errorBox.style.display = 'block';
