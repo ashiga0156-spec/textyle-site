@@ -90,6 +90,33 @@
     text-align:right;
   }
 
+  .criteriaintro{
+    margin: 0 0 26px;
+    padding-bottom: 22px;
+    border-bottom: 1px solid var(--line-soft);
+  }
+  .criteriaintro p{
+    font-size: 12.5px;
+    color: var(--ink-soft);
+    line-height: 1.7;
+    margin: 0 0 12px;
+  }
+  .criteriapills{
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  .pill{
+    font-family: var(--font-mono);
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--ink);
+    background: var(--paper);
+    border: 1px solid var(--line);
+    border-radius: 999px;
+    padding: 5px 12px;
+  }
+
   .card{
     background: var(--surface);
     border: 1px solid var(--line);
@@ -619,6 +646,17 @@
     </div>
     <div class="meta">診断基準 v1.0</div>
   </header>
+
+  <div class="criteriaintro">
+    <p>一級土木施工管理技士が設計した独自基準で、住宅・建設コンテンツを次の5つの観点から評価します。</p>
+    <div class="criteriapills">
+      <span class="pill">一次情報の深さ</span>
+      <span class="pill">技術的正確性</span>
+      <span class="pill">信頼シグナル（E-E-A-T）</span>
+      <span class="pill">検索意図との整合性</span>
+      <span class="pill">構造・内部リンク</span>
+    </div>
+  </div>
 
   <div class="card">
     <h2>診断する記事</h2>
