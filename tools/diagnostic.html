@@ -195,7 +195,8 @@
   }
   .stampbtn:hover{ transform: translate(-1px,-1px); box-shadow: 4px 4px 0 var(--ink); }
   .stampbtn:active{ transform: translate(2px,2px); box-shadow: 0 0 0 var(--ink); }
-  .stampbtn:disabled{ opacity:0.6; cursor:progress; box-shadow:3px 3px 0 var(--ink); transform:none; }
+  .stampbtn:disabled{ opacity:0.5; cursor:not-allowed; box-shadow:3px 3px 0 var(--ink); transform:none; }
+  .stampbtn.loading{ cursor:progress; }
 
   .ghostbtn{
     width:100%;
@@ -703,7 +704,7 @@
     <div class="datanote">
       入力された記事本文は保存されません。診断処理のため、AI（Claude）へ一時的に送信されます。診断結果はAIによる評価であり、検索順位や専門的な正確性を保証するものではありません。
     </div>
-    <button class="stampbtn" id="submitbtn">診断を開始する</button>
+    <button class="stampbtn" id="submitbtn" disabled>診断を開始する</button>
     <button class="ghostbtn" id="samplebtn">サンプル結果を見る（無料版プレビュー）</button>
     <div class="scanline" id="scanline"></div>
     <div class="loadingnote" id="loadingnote">一級土木施工管理技士の観点から解析しています（約10〜15秒）</div>
@@ -1181,7 +1182,9 @@ async function runDiagnosis(skipPrecheck){
   const btn = document.getElementById('submitbtn');
   const scanline = document.getElementById('scanline');
   const loadingnote = document.getElementById('loadingnote');
+  isDiagnosing = true;
   btn.disabled = true;
+  btn.classList.add('loading');
   btn.textContent = '検査中…';
   scanline.style.width = '0%';
   requestAnimationFrame(()=>{ scanline.style.width = '100%'; });
@@ -1304,10 +1307,12 @@ ${baseSchema}`;
       runDiagnosis(true);
     });
   }finally{
-    btn.disabled = false;
+    isDiagnosing = false;
+    btn.classList.remove('loading');
     btn.textContent = '診断を開始する';
     scanline.style.width = '0%';
     loadingnote.className = 'loadingnote';
+    updateSubmitState();
   }
 }
 
@@ -1327,6 +1332,19 @@ const SAMPLE_RESULT = {
     {priority:"低", text:"関連記事への内部リンクを追加し、サイト内回遊を促す構成にする"}
   ]
 };
+
+let isDiagnosing = false;
+
+function isFormValid(){
+  const body = document.getElementById('f-body').value.trim();
+  const industry = document.getElementById('f-industry').value;
+  return body.length >= 200 && !!industry;
+}
+
+function updateSubmitState(){
+  if(isDiagnosing) return;
+  document.getElementById('submitbtn').disabled = !isFormValid();
+}
 
 function updateCharCounter(){
   const body = document.getElementById('f-body').value;
@@ -1350,9 +1368,12 @@ function updateCharCounter(){
   }
   counter.textContent = text;
   counter.className = 'charcounter ' + state;
+  updateSubmitState();
 }
 document.getElementById('f-body').addEventListener('input', updateCharCounter);
+document.getElementById('f-industry').addEventListener('change', updateSubmitState);
 updateCharCounter();
+updateSubmitState();
 
 document.getElementById('samplebtn').addEventListener('click', ()=>{
   document.getElementById('errorbox').style.display = 'none';
