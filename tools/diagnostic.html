@@ -131,7 +131,7 @@
     padding:10px 12px;
     resize: vertical;
   }
-  textarea{ min-height:160px; line-height:1.6; }
+  textarea{ min-height:220px; line-height:1.6; }
   input:focus, select:focus, textarea:focus{
     outline: 2px solid var(--accent);
     outline-offset:1px;
@@ -191,6 +191,14 @@
     margin-top:10px;
     transition: width 1.2s linear;
   }
+  .loadingnote{
+    display:none;
+    font-size:11.5px;
+    color: var(--ink-soft);
+    text-align:center;
+    margin-top:8px;
+  }
+  .loadingnote.show{ display:block; }
 
   /* results */
   #results{ display:none; }
@@ -342,7 +350,22 @@
     font-size:15px;
     flex-shrink:0;
   }
+  .recbody{ flex:1; min-width:0; }
   .rectext{ font-size:13.5px; line-height:1.65; }
+  .priobadge{
+    display:inline-block;
+    font-family: var(--font-mono);
+    font-size:10px;
+    font-weight:700;
+    color:#fff;
+    border-radius:2px;
+    padding:2px 7px;
+    margin-bottom:5px;
+    letter-spacing:0.03em;
+  }
+  .priobadge.prio-high{ background: var(--bad); }
+  .priobadge.prio-mid{ background: var(--warn); }
+  .priobadge.prio-low{ background: var(--good); }
 
   .modetoggle{
     display:flex;
@@ -360,6 +383,13 @@
     border:1px solid var(--line);
     border-radius:3px;
     background:var(--paper);
+    transition: border-color 0.15s ease, background 0.15s ease, box-shadow 0.15s ease;
+  }
+  .radiolabel:has(input:checked){
+    border-color: var(--accent);
+    background: var(--accent-soft);
+    box-shadow: 0 0 0 1px var(--accent) inset;
+    font-weight:700;
   }
   .radiolabel input{
     accent-color: var(--accent);
@@ -638,6 +668,7 @@
     <button class="stampbtn" id="submitbtn">診断を開始する</button>
     <button class="ghostbtn" id="samplebtn">サンプル結果を見る（無料版プレビュー）</button>
     <div class="scanline" id="scanline"></div>
+    <div class="loadingnote" id="loadingnote">一級土木施工管理技士の観点から解析しています（約10〜15秒）</div>
   </div>
 
   <div class="errorbox" id="errorbox"></div>
@@ -933,12 +964,24 @@ function renderResults(data){
     ? `特に「${weakestItem.name}」（${weakestItem.score}点）を中心に、次の順で改善すると効果的です。`
     : 'スコアをさらに伸ばすなら、次の点から着手すると効果的です。';
 
+  const PRIORITY_CLASS = { '高':'prio-high', '中':'prio-mid', '低':'prio-low' };
+
   const recWrap = document.getElementById('recs');
   recWrap.innerHTML = '';
   (data.recommendations||[]).forEach((r,i)=>{
+    const isObj = r && typeof r === 'object';
+    const text = isObj ? r.text : r;
+    const priority = isObj ? r.priority : null;
+    const badgeClass = PRIORITY_CLASS[priority] || 'prio-mid';
     const el = document.createElement('div');
     el.className = 'recitem';
-    el.innerHTML = `<span class="recnum">${String(i+1).padStart(2,'0')}</span><span class="rectext">${r}</span>`;
+    el.innerHTML = `
+      <span class="recnum">${String(i+1).padStart(2,'0')}</span>
+      <div class="recbody">
+        ${priority ? `<span class="priobadge ${badgeClass}">優先度：${priority}</span><br>` : ''}
+        <span class="rectext">${text}</span>
+      </div>
+    `;
     recWrap.appendChild(el);
   });
 
@@ -963,7 +1006,12 @@ function buildResultText(){
   });
   if(d.recommendations && d.recommendations.length){
     lines.push('【優先改善提案】');
-    d.recommendations.forEach((r, i) => lines.push(`${i+1}. ${r}`));
+    d.recommendations.forEach((r, i) => {
+      const isObj = r && typeof r === 'object';
+      const text = isObj ? r.text : r;
+      const priority = isObj ? r.priority : null;
+      lines.push(`${i+1}. ${priority ? `[優先度：${priority}] ` : ''}${text}`);
+    });
     lines.push('');
   }
   lines.push('---');
@@ -1094,10 +1142,12 @@ async function runDiagnosis(skipPrecheck){
 
   const btn = document.getElementById('submitbtn');
   const scanline = document.getElementById('scanline');
+  const loadingnote = document.getElementById('loadingnote');
   btn.disabled = true;
   btn.textContent = '検査中…';
   scanline.style.width = '0%';
   requestAnimationFrame(()=>{ scanline.style.width = '100%'; });
+  loadingnote.className = 'loadingnote show';
 
   const mode = document.querySelector('input[name=mode]:checked').value;
 
@@ -1112,7 +1162,11 @@ async function runDiagnosis(skipPrecheck){
     {"name": "検索意図との整合性", "score": 数値, "comment": "1文（40字程度まで）", "basis": "1文（40字程度まで）"},
     {"name": "構造・内部リンク", "score": 数値, "comment": "1文（40字程度まで）", "basis": "1文（40字程度まで）"}
   ],
-  "recommendations": ["優先度の高い改善提案を1文で", "2つ目の改善提案", "3つ目の改善提案"]${mode === 'edit' ? ',\n  "edits": [\n    {"original": "本文から一字一句そのまま抜き出した問題箇所（10〜30文字程度）", "revised": "一次情報に基づく修正後の文", "reason": "1文（30字程度まで）"}\n  ]' : ''}
+  "recommendations": [
+    {"priority": "高", "text": "最も優先度の高い改善提案を1文で"},
+    {"priority": "中" または "低", "text": "2つ目の改善提案"},
+    {"priority": "中" または "低", "text": "3つ目の改善提案"}
+  ]${mode === 'edit' ? ',\n  "edits": [\n    {"original": "本文から一字一句そのまま抜き出した問題箇所（10〜30文字程度）", "revised": "一次情報に基づく修正後の文", "reason": "1文（30字程度まで）"}\n  ]' : ''}
 }`;
 
   const editInstruction = mode === 'edit'
@@ -1137,7 +1191,6 @@ async function runDiagnosis(skipPrecheck){
 ①記事本文の具体的にどの記述を見てそう判断したか
 ②広く確立された一般原則（例：新耐震基準の区分、労働安全衛生法の基本的な考え方、E-E-A-Tの考え方など）
 条文番号・規格番号・数値基準など、正確に断定できない細部は引用しないこと。断定できない場合は「一般的な業界慣行として」のように一般化して表現すること。
-本文から語句を引用する場合は必ず「」（かぎ括弧）で囲み、ダブルクォート(")は本文引用も含め一切使用しないこと（JSON形式が壊れるため）。
 
 採点の一貫性を保つため、各基準で共通して次の目安を用いてください：
 - 90〜100点：具体的な数値・事例・専門的根拠が複数示され、業界基準に照らして誤りがない
@@ -1147,6 +1200,12 @@ async function runDiagnosis(skipPrecheck){
 - 0〜29点：明らかな誤りがある、またはほぼ内容が伴っていない
 同じ記事を再評価する場合も、この目安に沿って毎回同じ基準で採点すること。
 
+"recommendations"には2〜3件の改善提案を出し、それぞれに"priority"（優先度）を付けてください。判断基準は次の通りです：
+- 高：検索評価・専門性のスコアに直結する重要な課題。放置すると評価に大きく影響する
+- 中：対応が望ましいが、緊急度はそれほど高くない
+- 低：余裕があれば対応したい、仕上げレベルの改善
+最もスコアが低かった基準に関連する提案を優先度「高」にすること。
+
 出力は必ず以下のJSON形式のみとし、前後に説明文やマークダウンのコードフェンスを含めないこと。
 
 ${baseSchema}`;
@@ -1154,32 +1213,22 @@ ${baseSchema}`;
   const userContent = `業種：${industry}\nタイトル：${title || '（未入力）'}\n\n本文：\n${body}`;
 
   try{
-    const callApi = async (maxTokens) => {
-      const res = await fetchWithTimeout("https://textyle-diagnostic.a-shiga0156.workers.dev", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          model: "claude-sonnet-5",
-          max_tokens: maxTokens,
-          system: systemPrompt,
-          messages: [{ role: "user", content: userContent }]
-        })
-      }, 45000);
-      const json = await res.json();
-      if(!res.ok || json.error){
-        const msg = (json.error && json.error.message) ? json.error.message : ('HTTPステータス ' + res.status);
-        throw new Error('APIエラー: ' + msg);
-      }
-      return json;
-    };
+    const response = await fetchWithTimeout("https://textyle-diagnostic.a-shiga0156.workers.dev", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        model: "claude-sonnet-5",
+        max_tokens: 1500,
+        system: systemPrompt,
+        messages: [{ role: "user", content: userContent }]
+      })
+    }, 45000);
 
-    // edit（赤字修正案）モードはedits配列の分だけ出力が長くなるため上限を分ける
-    const baseMaxTokens = mode === 'edit' ? 3500 : 2200;
-    let data = await callApi(baseMaxTokens);
+    const data = await response.json();
 
-    // 出力が長さ上限で切れて途中終了した場合は、上限を上げて1回だけ再試行する
-    if(data.stop_reason === 'max_tokens'){
-      data = await callApi(baseMaxTokens + 1500);
+    if(!response.ok || data.error){
+      const msg = (data.error && data.error.message) ? data.error.message : ('HTTPステータス ' + response.status);
+      throw new Error('APIエラー: ' + msg);
     }
 
     const textBlocks = (data.content || []).filter(b => b.type === 'text').map(b => b.text).join('\n');
@@ -1192,8 +1241,7 @@ ${baseSchema}`;
     try{
       parsed = JSON.parse(cleaned);
     }catch(parseErr){
-      const truncNote = data.stop_reason === 'max_tokens' ? '（出力が長さ上限で途中で切れています。再試行後も発生する場合はmax_tokensのさらなる引き上げが必要です）' : '';
-      throw new Error('JSON解析エラー' + truncNote + '。モデルの生出力: ' + cleaned.slice(0,400));
+      throw new Error('JSON解析エラー。モデルの生出力: ' + cleaned.slice(0,400));
     }
     renderResults(parsed);
   }catch(e){
@@ -1221,6 +1269,7 @@ ${baseSchema}`;
     btn.disabled = false;
     btn.textContent = '診断を開始する';
     scanline.style.width = '0%';
+    loadingnote.className = 'loadingnote';
   }
 }
 
@@ -1235,9 +1284,9 @@ const SAMPLE_RESULT = {
     {name:"構造・内部リンク", score:80, comment:"見出し構成は読みやすく整っています。関連記事への内部リンクを足すと、サイト内回遊も見込めます。", basis:"見出しの階層構造と、関連記事への導線の有無を確認して判断しています。"}
   ],
   recommendations: [
-    "施工事例やC値・UA値などの実測データを加え、一次情報としての厚みをもう一段プラスする",
-    "執筆者・監修者のプロフィールと資格を明記し、信頼性シグナルを強化する",
-    "関連記事への内部リンクを追加し、サイト内回遊を促す構成にする"
+    {priority:"高", text:"執筆者・監修者のプロフィールと資格を明記し、信頼性シグナル（E-E-A-T）を強化する"},
+    {priority:"中", text:"施工事例やC値・UA値などの実測データを加え、一次情報としての厚みをもう一段プラスする"},
+    {priority:"低", text:"関連記事への内部リンクを追加し、サイト内回遊を促す構成にする"}
   ]
 };
 
