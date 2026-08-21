@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<!-- ===== SEO: meta ===== -->
+<title>AI診断ツールを自作して分かった｜良い記事・悪い記事を見分ける5つの視点 | TEXTYLE</title>
+<meta name="description" content="建設・住宅系のWeb記事を評価するAI診断ツールを自作する中で見えてきた、良い記事と悪い記事を分ける5つの視点をお伝えします。発注者自身が記事の質をチェックする際にも使える考え方です。">
+<meta name="robots" content="index, follow">
+<link rel="canonical" href="https://textyle-ni.net/column/ai-shindan-tool-jisaku.html">
+<link rel="icon" type="image/png" href="../assets/favicon.png">
+
+<!-- ===== SEO: OGP ===== -->
+<meta property="og:type" content="article">
+<meta property="og:locale" content="ja_JP">
+<meta property="og:title" content="AI診断ツールを自作して分かった｜良い記事・悪い記事を見分ける5つの視点">
+<meta property="og:description" content="建設・住宅系のWeb記事を評価するAI診断ツールを自作する中で見えてきた、良い記事と悪い記事を分ける視点をお伝えします。">
+<meta property="og:url" content="https://textyle-ni.net/column/ai-shindan-tool-jisaku.html">
+<meta property="og:site_name" content="TEXTYLE">
+<meta property="og:image" content="https://textyle-ni.net/assets/og-image.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="TEXTYLE / REGIONAL CREATIVE">
+
+<!-- ===== SEO: Twitter Card ===== -->
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="AI診断ツールを自作して分かった｜良い記事・悪い記事を見分ける5つの視点">
+<meta name="twitter:description" content="建設・住宅系のWeb記事を評価するAI診断ツールの開発経験から見えてきた、良い記事と悪い記事を分ける視点をお伝えします。">
+<meta name="twitter:image" content="https://textyle-ni.net/assets/og-image.png">
+
+<!-- ===== SEO: 構造化データ ===== -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    { "@type": "ListItem", "position": 1, "name": "TEXTYLE", "item": "https://textyle-ni.net/" },
+    { "@type": "ListItem", "position": 2, "name": "お役立ち情報", "item": "https://textyle-ni.net/column/index.html" },
+    { "@type": "ListItem", "position": 3, "name": "AI診断ツールを自作して分かった、良い記事・悪い記事の見分け方", "item": "https://textyle-ni.net/column/ai-shindan-tool-jisaku.html" }
+  ]
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Article",
+  "headline": "AI診断ツールを自作して分かった｜良い記事・悪い記事を見分ける5つの視点",
+  "author": { "@type": "Person", "name": "志賀玲", "alternateName": "Rei Shiga" },
+  "publisher": { "@type": "Organization", "name": "TEXTYLE" },
+  "mainEntityOfPage": "https://textyle-ni.net/column/ai-shindan-tool-jisaku.html",
+  "dateModified": "2026-08-21",
+  "inLanguage": "ja"
+}
+</script>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Zen+Kaku+Gothic+New:wght@500;700;900&family=Noto+Sans+JP:wght@400;500;700&family=Poppins:wght@500;600;700&display=swap" rel="stylesheet">
+
+<link rel="stylesheet" href="../assets/styles.css">
+</head>
+<body>
+
+<header class="site-header">
+  <div class="wrap">
+    <a href="../index.html"><img class="logo-lockup" src="../assets/logo-lockup.png" alt="TEXTYLE / REGIONAL CREATIVE" width="640" height="202" loading="eager"></a>
+    <nav class="site-nav">
+      <a href="../index.html#specialty">専門領域</a>
+      <a href="../works.html">実績</a>
+      <a href="../index.html#service">サービス</a>
+      <a href="../index.html#profile">プロフィール</a>
+      <a href="index.html">お役立ち情報</a>
+      <a href="../index.html#contact">お問い合わせ</a>
+      <a href="../en.html">EN</a>
+    </nav>
+  </div>
+</header>
+
+<section class="hero page-hero">
+  <div class="wrap hero-inner">
+    <div class="hero-grid">
+      <div class="breadcrumb"><a href="../index.html">TEXTYLE</a> / <a href="index.html">お役立ち情報</a> / AI診断ツールを自作して分かった、良い記事・悪い記事の見分け方</div>
+      <div class="eyebrow">Column — AI時代の文章づくり</div>
+      <h1>AI診断ツールを自作して分かった<br>良い記事・悪い記事を<br class="br-mobile">見分ける5つの視点</h1>
+      <p class="lede">「AIで書かれた記事の質を自分では判断できない」。そんな発注者側の悩みから、建設・住宅系のWeb記事を評価するAI診断ツールを自作しました。開発の中で見えてきた、良い記事と悪い記事を分ける視点をお伝えします。</p>
+    </div>
+  </div>
+  <svg class="wave" viewBox="0 0 1440 80" preserveAspectRatio="none" aria-hidden="true">
+    <path d="M0,30 C240,70 480,0 720,30 C960,60 1200,0 1440,30 L1440,80 L0,80 Z" style="fill:var(--paper)"></path>
+  </svg>
+</section>
+
+<section class="reveal">
+  <div class="wrap">
+    <div class="article-body">
+
+      <div class="article-meta-bar">
+        <span class="cat-tag">AI時代の文章づくり</span>
+        <span>最終更新日：2026年8月21日</span>
+      </div>
+
+      <p>TEXTYLEでは、建設・住宅業界向けのWeb記事を無料で診断できるAIツールを自作し、公開しています。開発のきっかけは、多くの発注者様が抱える「AIで書かれた記事や外注した記事の質を、自分では判断できない」という悩みでした。今回は、このツールを作る過程で見えてきた、良い記事と悪い記事を分ける視点についてお伝えします。</p>
+
+      <div class="callout">
+        <h3>このページで分かること</h3>
+        <ul style="margin-bottom:0;">
+          <li>診断ツールを作る中でぶつかった、「良い記事」を定義する難しさ</li>
+          <li>試行錯誤の末にたどり着いた5つの評価軸とその考え方</li>
+          <li>発注者自身が、ツールなしでもチェックできる視点</li>
+        </ul>
+      </div>
+
+      <h2>「良い記事」を定義しようとしてぶつかった壁</h2>
+      <p>ツールを作り始めた当初は、もっと単純に考えていました。文字数や見出しの数、キーワードの含有率といった、機械的にカウントできる指標を組み合わせれば、記事の質はある程度測れるだろうと。しかし実際に多数の記事――優秀なものから、お世辞にも良いとは言えないものまで――を読み比べていくと、そうした表面的な指標では説明できない「質の差」があることに気づきました。文字数が同じでも、読み手に伝わる記事と伝わらない記事がある。見出しの数が同じでも、専門性が感じられる記事とそうでない記事がある。この「機械的には測れない部分」こそ、実は記事の質を左右する本質だと気づいたのが、開発の出発点でした。</p>
+
+      <h2>たどり着いた5つの評価軸</h2>
+      <p>試行錯誤の末、次の5つの軸で記事を評価する形に落ち着きました。</p>
+
+      <h3>①一次情報の深さ</h3>
+      <p>現場感のある具体的な記述か、それとも表面的な一般論の寄せ集めか。数値や固有の事例が伴っているかどうかで、大きく差が出るポイントです。</p>
+
+      <h3>②技術的正確性</h3>
+      <p>建設・住宅業界特有の専門的な記述に、誤りや曖昧さがないか。業界知識のない書き手が陥りやすい落とし穴です。</p>
+
+      <h3>③信頼シグナル(E-E-A-T)</h3>
+      <p>執筆者・監修者の情報や、実績・資格の明示があるか。誰が書いたか分からない記事は、それだけで信頼性を落とします。</p>
+
+      <h3>④検索意図との整合性</h3>
+      <p>タイトルや見出しが、読者の実際の疑問に答える形になっているか。キーワードを詰め込んだだけの見出しは、読者の疑問とズレがちです。</p>
+
+      <h3>⑤構造・内部リンク</h3>
+      <p>見出し構成や導線が読みやすく、次の行動につながる設計になっているか。良い内容でも、構造が悪いと最後まで読んでもらえません。</p>
+
+      <h2>実際に記事を診断してわかったこと</h2>
+      <p>このツールで、実際に十数本の記事――明らかに優秀なものから、問題の多そうなものまで診断してみました。そこで見えてきたのは、5つの軸の中でも「一次情報の深さ」で特に差がつきやすいという傾向です。技術的な正確性や構造は、ある程度型を守れば及第点に達しますが、「現場でしか分からない具体性」は、取材や経験なしには埋められません。逆に言えば、この部分こそが、AIによる文章生成が広がる中で書き手や制作会社を選ぶ際の最も重要な判断基準になっていくと感じています。</p>
+
+      <h2>発注者自身がすぐ使えるセルフチェックの視点</h2>
+      <p>ツールを使わなくても、以下の視点で記事を読み返すだけで、質をある程度見極められます。</p>
+      <ul>
+        <li>数値や事例がその記事だけの固有のものかどの記事にも使い回せそうな一般論か</li>
+        <li>執筆者や監修者の情報が明記されているか</li>
+        <li>タイトル・見出しを見て、自分の疑問にそのまま答えてくれそうかどうか</li>
+      </ul>
+
+      <div class="article-cta">
+        <h3>建設・住宅系記事の診断ツールを試してみませんか</h3>
+        <p>今回ご紹介した5つの視点をもとに、AIが実際に記事を採点する無料ツールを公開しています。ご自身の記事や外注先の記事のチェックに、ぜひご活用ください。</p>
+        <div class="cta-buttons">
+          <a class="btn-primary" href="../service/diagnostic.html">診断ツールを試す</a>
+          <a class="btn-primary" href="mailto:a.shiga@textyle-ni.net">メールで相談する</a>
+        </div>
+      </div>
+
+      <h2>よくある質問</h2>
+      <div class="faq-item">
+        <p class="faq-q">この診断ツールは無料で使えますか？</p>
+        <p class="faq-a">はい、どなたでも無料でご利用いただけます。建設・住宅業界向けの記事を想定した評価軸になっているため、他業種の記事では精度が下がる場合があります。</p>
+      </div>
+      <div class="faq-item">
+        <p class="faq-q">ツールの診断結果だけで、記事の良し悪しを判断してよいのでしょうか？</p>
+        <p class="faq-a">参考情報としてご活用いただくのが適切です。特に「一次情報の深さ」のような定性的な要素は、AIによる評価にも限界があります。最終的な判断材料の一つとしてお使いください。</p>
+      </div>
+      <div class="faq-item">
+        <p class="faq-q">自社の記事が低いスコアだった場合、どう改善すればよいですか？</p>
+        <p class="faq-a">診断結果には改善提案も表示されます。特にスコアの低い項目から優先的に見直すことをおすすめします。改善が難しい場合は、記事制作のご相談も承っております。</p>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<section class="cta-section reveal" style="position:relative;">
+  <svg class="wave" viewBox="0 0 1440 80" preserveAspectRatio="none" aria-hidden="true" style="transform:rotate(180deg); margin-bottom:-2px;">
+    <path d="M0,30 C240,70 480,0 720,30 C960,60 1200,0 1440,30 L1440,80 L0,80 Z" style="fill:var(--paper)"></path>
+  </svg>
+  <div class="wrap" style="padding: 20px 28px 10px;">
+    <div class="eyebrow" style="display:flex;">Contact</div>
+    <h2>お仕事のご相談を承ります</h2>
+    <p class="lede">SEOコンテンツ設計、記事執筆・編集、LPライティングなど、お仕事のご相談はこちらから。</p>
+    <div class="cta-buttons">
+      <a class="btn-primary" href="mailto:a.shiga@textyle-ni.net">メールで相談する</a>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <div class="foot-row">
+      <span>© 2026 TEXTYLE / Rei Shiga</span>
+      <span>Niigata, Japan</span>
+    </div>
+  </div>
+</footer>
+
+<script>
+  if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches && 'IntersectionObserver' in window) {
+    const io = new IntersectionObserver((entries) => {
+      entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); } });
+    }, { threshold: 0.12 });
+    document.querySelectorAll('.reveal').forEach(el => io.observe(el));
+  } else {
+    document.querySelectorAll('.reveal').forEach(el => el.classList.add('in'));
+  }
+</script>
+
+</body>
+</html>
