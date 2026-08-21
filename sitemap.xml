@@ -20,9 +20,15 @@
   </url>
   <url>
     <loc>https://textyle-ni.net/column/index.html</loc>
-    <lastmod>2026-08-19</lastmod>
+    <lastmod>2026-08-21</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://textyle-ni.net/column/ai-shindan-tool-jisaku.html</loc>
+    <lastmod>2026-08-21</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
   </url>
   <url>
     <loc>https://textyle-ni.net/column/kimitsu-dannetsu-web-shukyaku.html</loc>
