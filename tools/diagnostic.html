@@ -696,7 +696,7 @@
       <label>出力モード</label>
       <div class="modetoggle">
         <label class="radiolabel"><input type="radio" name="mode" value="score" checked> スコア診断（無料）</label>
-        <div class="radiolabel locked">
+        <div class="radiolabel locked" id="editmodelocked" onclick="promptForEditToken()">
           <span class="lockicon">🔒</span> 赤字修正案つき診断 — 本格監修サービスでご提供
         </div>
       </div>
@@ -759,23 +759,51 @@
 </div>
 
 <script>
+// --- 赤字修正モード（本人限定）の解除処理 -----------------------------
+// パスワードの正解チェックはここでは行わない（HTMLソースに正解を書かないため）。
+// 入力された値をそのままトークンとして保存し、実際の検証はCloudflare Worker側で行う。
+// Workerが不正なトークンを弾くので、ここでのUI表示はあくまで利便性のためのもの。
+const EDIT_AUTH_KEY = 'textyle_diag_edit_token';
+
+function showEditModeOption(){
+  const locked = document.getElementById('editmodelocked');
+  const target = locked || document.getElementById('editmodeunlocked');
+  if(!target) return;
+  const label = document.createElement('label');
+  label.className = 'radiolabel';
+  label.id = 'editmodeunlocked';
+  label.innerHTML = '<input type="radio" name="mode" value="edit"> 赤字修正案つき診断（本人限定） <button type="button" id="editauthchange" style="margin-left:8px;font-size:11px;">🔑変更</button>';
+  target.replaceWith(label);
+  document.getElementById('editauthchange').addEventListener('click', (e)=>{
+    e.preventDefault();
+    promptForEditToken();
+  });
+}
+
+function promptForEditToken(){
+  const input = window.prompt('パスワードを入力してください');
+  if(input === null || input === '') return; // キャンセル/空欄なら何もしない
+  try{ localStorage.setItem(EDIT_AUTH_KEY, input); }catch(e){}
+  showEditModeOption();
+}
+
+function getEditAuthToken(){
+  try{ return localStorage.getItem(EDIT_AUTH_KEY) || ''; }catch(e){ return ''; }
+}
+
+function clearEditAuthToken(){
+  try{ localStorage.removeItem(EDIT_AUTH_KEY); }catch(e){}
+}
+
+(function initEditModeUnlock(){
+  if(getEditAuthToken()){
+    showEditModeOption();
+  }
+})();
+// ------------------------------------------------------------------
+
 const CRITERIA_ORDER = ["一次情報の深さ","技術的正確性","信頼シグナル（E-E-A-T）","検索意図との整合性","構造・内部リンク"];
 
-const THEME_CHECKS = {
-  "気密・断熱・省エネ性能（新築）": "C値・UA値の意味を混同していないか。気密性能が断熱性能や計画換気を機能させるための前提条件であるという関係性を正しく説明できているか。『気密化すると結露や木材腐朽が悪化する』という誤解（実際には気密シート・気密テープによる適切な施工でむしろ防止される）をそのまま書いていないか。気流止め・防湿層・気密テープの施工に関する記述が正確か。グラスウール・現場発泡ウレタン・セルロースファイバーなど断熱材ごとの特性を正しく区別できているか。",
-  "外壁・外装・防水": "外壁通気工法（通気層・透湿防水シート）の仕組みが正確か。『換気』（広い空間での空気の入れ替え）と『掃気』（通気層など狭い空間での空気の流れ）を混同していないか。躯体掃気の目的（夏の高温多湿対策・結露防止・木材腐朽対策による耐久性向上、冬の小屋裏結露やつらら対策）を正しく説明できているか。サイディングと塗り壁で耐用年数や施工方法を混同していないか。",
-  "水回りリフォーム": "給排水管の更新可否や勾配計画、浴室・洗面所の防水処理、換気計画、給湯設備の号数・互換性に関する記述が正確か。",
-  "内装・間取りリフォーム": "下地処理や建材の耐久性に関する記述が正確か、増改築や間取り変更を伴う場合は建築確認申請の要否・既存不適格の扱いに触れているか。",
-  "耐震・構造リフォーム": "新耐震・旧耐震基準の違いを正しく扱えているか、耐震診断や耐力壁の追加といった補強工法の記述に誤りがないか。",
-  "断熱・省エネリフォーム": "内窓設置・床下断熱・既存壁を壊さない工法など、既存住宅特有の制約を踏まえた記述になっているか。新築向けの断熱手法との混同がないか。断熱・省エネリフォームは施工が難しく、使用部材の性能以上に施工精度（正しい手順での施工）が住宅性能の向上を左右するという点を踏まえているか。部材のスペック比較に終始し、施工品質の重要性に触れていない記事は表面的と判断すること。",
-  "土木・インフラ工事": "盛土・切土、排水計画、施工管理（品質管理・安全管理）に関する用語や手順の記述が正確か、測量・数量計算などの実務表現に誤りがないか。工期の遵守を優先するあまり品質検査や施工手順を省略・簡略化することを是とするような記述になっていないか。工期よりも品質・安全が優先されるべきという前提を踏まえているか。",
-  "安全管理・労働安全": "労働安全衛生法に基づく基準（足場の点検、墜落制止用器具の使用、KY活動、熱中症対策等）の記述が正確か、実際の現場運用に即した具体性があるか。工期のプレッシャーが『この検査は省略していい』『これくらいで良しとしよう』といった妥協や慢心につながりやすいという構造的リスクに触れているか。安全対策は工期よりも優先されるべきという前提が反映されているか。",
-  "品質管理・工程管理": "施工計画・工程表の組み方や品質管理の手順（検査・記録の取り方等）に関する記述が正確か、現場実務に即した具体性があるか。工程遵守を優先するあまり品質検査の基準を緩めることを是とするような記述になっていないか。工期を守ることよりも品質・安全を優先すべきという考え方が反映されているか。手を抜いた箇所は完成後の構造物の寿命を左右するという視点に触れているか。",
-  "住宅設備・建材": "製品スペックの引用が正確か、比較記事として誇大表現や事実誤認がないか。換気設備などは、床面積・天井高等の条件に応じた必要換気量の計算に基づいて選定されるべきで、機器のカタログスペックを提示するだけで計算の必要性に触れていない記事は手抜きと判断すること。この視点は換気設備に限らず、性能を数値で語る住宅設備全般（給湯設備の号数選定等）にも当てはまる。",
-  "工務店・ビルダーの経営/集客": "技術的正確性よりも、実際の顧客事例・実績数値など一次情報の有無を重視して評価する。",
-  "解体工事": "アスベスト（石綿）事前調査の実施義務（石綿障害予防規則）に触れているか。建設リサイクル法に基づく届出（一定規模以上の解体工事は都道府県への事前届出が必要）への言及があるか。近隣対策（振動・騒音・粉じん対策、養生）の記述が具体的か。産業廃棄物の適正処理・マニフェスト管理への言及があるか。作業員の安全対策（倒壊・崩落を防ぐ解体順序や支保工、重機による事故防止、有害物質への暴露防止装備等）への言及があるか。",
-  "その他建設関連": "建設・住宅分野の一般的な技術記述として、明らかな誤りや曖昧な表現がないか。"
-};
 
 function escapeHtml(value){
   if(value === null || value === undefined) return '';
@@ -1250,79 +1278,22 @@ async function runDiagnosis(skipPrecheck){
 
   const mode = document.querySelector('input[name=mode]:checked').value;
 
-  const baseSchema = `{
-  "overall_score": 数値(0-100),
-  "verdict": "合格レベル" または "要改善" または "要大幅改善",
-  "theme_mismatch": "選択されたテーマ「${industry}」と記事の実際の内容が明らかに一致しない場合のみ、その理由を1文で。一致していれば null",
-  "criteria": [
-    {"name": "一次情報の深さ", "score": 数値, "comment": "1文（40字程度まで）", "basis": "1文（40字程度まで）"},
-    {"name": "技術的正確性", "score": 数値, "comment": "1文（40字程度まで）", "basis": "1文（40字程度まで）"},
-    {"name": "信頼シグナル（E-E-A-T）", "score": 数値, "comment": "1文（40字程度まで）", "basis": "1文（40字程度まで）"},
-    {"name": "検索意図との整合性", "score": 数値, "comment": "1文（40字程度まで）", "basis": "1文（40字程度まで）"},
-    {"name": "構造・内部リンク", "score": 数値, "comment": "1文（40字程度まで）", "basis": "1文（40字程度まで）"}
-  ],
-  "recommendations": [
-    {"priority": "高", "text": "最も優先度の高い改善提案を1文で"},
-    {"priority": "中" または "低", "text": "2つ目の改善提案"},
-    {"priority": "中" または "低", "text": "3つ目の改善提案"}
-  ]${mode === 'edit' ? ',\n  "edits": [\n    {"original": "本文から一字一句そのまま抜き出した問題箇所（10〜30文字程度）", "revised": "一次情報に基づく修正後の文", "reason": "1文（30字程度まで）"}\n  ]' : ''}
-}`;
-
-  const editInstruction = mode === 'edit'
-    ? `\n\n加えて、本文の中から技術的に不正確・曖昧・表面的な箇所を最大4件具体的に検出し、"edits"として提示してください。"original"は本文から一字一句そのまま抜き出した短い引用（10〜30文字程度）にすること。要約や言い換えは禁止です。出力全体が長くなりすぎないよう、各項目は簡潔にまとめること。`
-    : '';
-
-  const themeCheck = THEME_CHECKS[industry] || THEME_CHECKS["その他建設関連"];
-
-  const systemPrompt = `あなたは一級土木施工管理技士の資格を持ち、住宅・建設業界に特化したSEOコンテンツを10年以上手がけてきた専門診断士・編集者です。現場の一次情報に基づく専門性と、検索エンジンでの評価基準の両方を理解しています。
-
-この記事のテーマは「${industry}」です。まず、記事の実際の内容がこのテーマと合っているか確認してください。明らかに別のテーマの内容（例：解体工事の記事なのに気密・断熱のテーマが選ばれている等）であれば、"theme_mismatch"にその旨を1文で記載し、技術的正確性の評価は記事の実際の内容に即して行ってください（無理に選択されたテーマの観点だけで評価しないこと）。テーマが合っている場合は、次の観点を重視してください：${themeCheck}
-
-与えられた記事を、次の5つの基準それぞれについて0〜100点で採点してください。
-
-1. 一次情報の深さ：現場感のある具体的な記述か、それとも表面的な一般論の寄せ集めか
-2. 技術的正確性：上記のテーマ別観点を踏まえ、専門的記述に誤りや曖昧さがないか
-3. 信頼シグナル（E-E-A-T）：執筆者・監修者情報、実績、資格の明示があるか
-4. 検索意図との整合性：タイトルや見出しが読者の実際の疑問に答えているか
-5. 構造・内部リンク：見出し構成や導線が読みやすく、行動につながる設計になっているか${editInstruction}
-
-各基準には必ず"basis"（根拠）を添えてください。根拠は次の2点で構成すること：
-①記事本文の具体的にどの記述を見てそう判断したか
-②広く確立された一般原則（例：新耐震基準の区分、労働安全衛生法の基本的な考え方、E-E-A-Tの考え方など）
-条文番号・規格番号・数値基準など、正確に断定できない細部は引用しないこと。断定できない場合は「一般的な業界慣行として」のように一般化して表現すること。
-
-採点の一貫性を保つため、各基準で共通して次の目安を用いてください：
-- 90〜100点：具体的な数値・事例・専門的根拠が複数示され、業界基準に照らして誤りがない
-- 70〜89点：概ね妥当だが、具体性や裏付けがもう一歩足りない
-- 50〜69点：内容は理解できるが一般論の域を出ない、または一部に曖昧さがある
-- 30〜49点：重要な要素が欠けている、または誤解を招く表現がある
-- 0〜29点：明らかな誤りがある、またはほぼ内容が伴っていない
-同じ記事を再評価する場合も、この目安に沿って毎回同じ基準で採点すること。
-
-"recommendations"には2〜3件の改善提案を出し、それぞれに"priority"（優先度）を付けてください。判断基準は次の通りです：
-- 高：検索評価・専門性のスコアに直結する重要な課題。放置すると評価に大きく影響する
-- 中：対応が望ましいが、緊急度はそれほど高くない
-- 低：余裕があれば対応したい、仕上げレベルの改善
-最もスコアが低かった基準に関連する提案を優先度「高」にすること。
-
-出力は必ず以下のJSON形式のみとし、前後に説明文やマークダウンのコードフェンスを含めないこと。
-
-${baseSchema}`;
-
-  const userContent = `業種：${industry}\nタイトル：${title || '（未入力）'}\n\n本文：\n${body}`;
-
   try{
+    const reqHeaders = { "Content-Type": "application/json" };
+    if(mode === 'edit'){
+      reqHeaders["X-Edit-Auth"] = getEditAuthToken();
+    }
+
     const response = await fetchWithTimeout("https://textyle-diagnostic.a-shiga0156.workers.dev", {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        model: "claude-sonnet-5",
-        max_tokens: 3000,
-        thinking: { type: "disabled" },
-        system: systemPrompt,
-        messages: [{ role: "user", content: userContent }]
-      })
+      headers: reqHeaders,
+      body: JSON.stringify({ industry, title, body, mode })
     }, 45000);
+
+    if(response.status === 401 || response.status === 403){
+      clearEditAuthToken();
+      throw new Error('EDIT_AUTH_FAILED');
+    }
 
     const data = await response.json();
 
@@ -1358,7 +1329,9 @@ ${baseSchema}`;
   }catch(e){
     console.error('診断エラー詳細:', e);
     let friendly;
-    if(e.message === 'TIMEOUT'){
+    if(e.message === 'EDIT_AUTH_FAILED'){
+      friendly = '本人限定モードのパスワードが正しくないか、期限切れの可能性があります。🔑変更ボタンからパスワードを入力し直してください。';
+    }else if(e.message === 'TIMEOUT'){
       friendly = '診断処理がタイムアウトしました（45秒経過）。サーバーが混み合っている可能性があります。少し時間をおいて、もう一度お試しください。';
     }else if(e.message === 'MAX_TOKENS'){
       friendly = '診断結果が長くなりすぎて、出力が途中で切れました。記事を短くするか、時間をおいてもう一度お試しください。';
