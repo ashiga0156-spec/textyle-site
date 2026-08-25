@@ -295,6 +295,13 @@
     display:flex; justify-content:space-between; align-items:center;
     font-size:12px; flex-wrap:wrap; gap:8px;
   }
+  footer .foot-sns{ display:flex; align-items:center; gap:14px; }
+  footer .foot-sns a{
+    display:inline-flex; align-items:center; justify-content:center;
+    color: rgba(255,255,255,0.7); transition: color .2s ease;
+  }
+  footer .foot-sns a:hover{ color: var(--gold); }
+  footer .foot-sns svg{ width:18px; height:18px; display:block; }
 
   @media (max-width: 720px){
     h1 .br-mobile{ display: inline; }
