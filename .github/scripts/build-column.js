@@ -29,6 +29,8 @@ const SITE_URL = 'https://textyle-ni.net';
 const STATIC_PAGES = [
   { loc: `${SITE_URL}/`, lastmod: '2026-08-04', changefreq: 'weekly', priority: '1.0' },
   { loc: `${SITE_URL}/works.html`, lastmod: '2026-08-04', changefreq: 'monthly', priority: '0.9' },
+  { loc: `${SITE_URL}/service/diagnostic.html`, lastmod: '2026-09-28', changefreq: 'monthly', priority: '0.9' },
+  { loc: `${SITE_URL}/tools/diagnostic.html`, lastmod: '2026-09-28', changefreq: 'monthly', priority: '0.8' },
   { loc: `${SITE_URL}/en.html`, lastmod: '2026-08-04', changefreq: 'monthly', priority: '0.7' },
 ];
 
