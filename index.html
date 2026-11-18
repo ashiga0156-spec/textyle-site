@@ -478,6 +478,11 @@
           headers: { 'Accept': 'application/json' }
         });
         if (res.ok) {
+          try {
+            if (typeof gtag === 'function') {
+              gtag('event', 'generate_lead', { form_id: 'contact-form' });
+            }
+          } catch (_) {}
           contactForm.hidden = true;
           status.textContent = 'お問い合わせありがとうございます。内容を確認のうえ、折り返しご連絡いたします。';
           status.className = 'form-status success';
