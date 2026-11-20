@@ -32,9 +32,15 @@
   </url>
   <url>
     <loc>https://textyle-ni.net/column/index.html</loc>
-    <lastmod>2026-11-19</lastmod>
+    <lastmod>2026-11-20</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://textyle-ni.net/column/civil-engineering-seo-first-steps.html</loc>
+    <lastmod>2026-11-19</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
   </url>
   <url>
     <loc>https://textyle-ni.net/column/construction-case-study-page.html</loc>
